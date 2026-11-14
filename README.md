@@ -2,7 +2,8 @@
 
 帮助中国电商和品牌团队，在向越南市场发布广告、商品页或客服内容之前，发现可能存在的文化、语言、地缘政治、平台和产品表达风险，并给出有来源的修改建议。
 
-- 部署地址：**待部署**（见“部署”一节，部署完成后在此填写）
+- 在线体验：**https://chuhai-redteam.netlify.app/** （无需登录；中国大陆网络可直接访问）
+- 部署检查：[deploy_report.md](deploy_report.md)
 - 产品规格：[PRODUCT_SPEC.md](PRODUCT_SPEC.md)
 - 证据审计：[audit_report.md](audit_report.md)
 - 功能测试：[functional_test_report.md](functional_test_report.md)
@@ -110,13 +111,16 @@ node scripts/generate-demo-cache.mjs http://localhost:3000   # 用真实模型�
 
 任何能运行 Node.js 20.9+ 的平台都可以：`npm ci && npm run build && npm start`，并在平台上配置上面的环境变量。
 
-**Vercel**（最省事）：把代码推到 GitHub，在 Vercel 中 Import 该仓库，Framework 选 Next.js，在 Settings → Environment Variables 中填写环境变量后部署。注意：`*.vercel.app` 域名在中国大陆经常无法直接访问。如果评委在国内，需要绑定自己的域名，或改用国内能访问的平台。
+**Netlify**（当前使用）：Netlify 中 Add new project → Import from GitHub，选择本仓库，构建设置由 `netlify.toml` 自动读取。在 Project configuration → Environment variables 中填写环境变量（可用 Import from a .env file 一次性导入），**不要**勾选 “Contains secret values”：`LLM_BASE_URL`、`LLM_MODEL` 的值在本 README 中出现，标记为机密会触发 Netlify 密钥扫描导致构建失败。改环境变量后需在 Deploys → Trigger deploy 重新部署才生效。推送到 `main` 分支会自动重新部署。Netlify 函数同步执行上限为 60 秒，应用的模型超时默认 40 秒。
+
+**Vercel**：把代码推到 GitHub，在 Vercel 中 Import 该仓库，Framework 选 Next.js，在 Settings → Environment Variables 中填写环境变量后部署。注意：`*.vercel.app` 域名在中国大陆经常无法直接访问。如果评委在国内，需要绑定自己的域名，或改用国内能访问的平台。
 
 部署完成后：
 
-1. 在 README 顶部填写公网地址；
-2. 打开首页，点击三个演示按钮确认能出结果；
-3. 用 `node e2e/run-e2e.mjs --main <公网地址> --label "public deployment"` 跑公网测试。
+1. 确认已运行 `supabase/policies.sql`；
+2. 打开 `/about`，确认证据来源显示“实时读取自 Supabase 证据库”；
+3. 点击三个演示按钮确认能出结果；
+4. 用 `node e2e/run-e2e.mjs --main <公网地址> --label "public deployment"` 跑浏览器端到端测试。
 
 ## Demo 使用方法
 
