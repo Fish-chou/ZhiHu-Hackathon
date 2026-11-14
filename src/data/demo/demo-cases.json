@@ -1,0 +1,29 @@
+[
+  {
+    "id": "map-store-locator",
+    "title": "越南敏感地理素材",
+    "expectedLevel": "high",
+    "contentType": "product_page",
+    "summary": "官网门店页：第三方底图沿用中文岛礁名，App 内嵌同款地图",
+    "label": "演示素材，非客户数据（合成，虚构品牌）",
+    "text": "【门店查询】\n全新上线！打开地图即可找到离你最近的门店，覆盖河内、胡志明市、岘港等城市。\n地图数据由第三方地图服务商提供，海域及岛屿名称沿用服务商默认标注（Xisha、Nansha）。\n同款门店地图已同步上线品牌 App，扫码即可下载。"
+  },
+  {
+    "id": "skincare-ad",
+    "title": "越南语言/文化表达",
+    "expectedLevel": "medium",
+    "contentType": "advertisement",
+    "summary": "护肤品广告：绝对化用语、功效承诺、没有来源的数据、广告语言版式",
+    "label": "演示素材，非客户数据（合成，虚构品牌）",
+    "text": "越南首发！我们卖得最好的美白精华，坚持使用 7 天，肤色变化看得见。\n敏感肌也能放心用，老客回购率超过 90%。\nBest whitening serum — Mua ngay hôm nay!"
+  },
+  {
+    "id": "cs-shipping-reply",
+    "title": "普通安全文案",
+    "expectedLevel": "low",
+    "contentType": "customer_service",
+    "summary": "客服发货通知：检验系统不会为了出结果而强行判定风险",
+    "label": "演示素材，非客户数据（合成）",
+    "text": "您好，您的订单已于今天发出，预计 3–5 个工作日送达。\n如果收到的商品有破损，请在签收后 48 小时内拍照联系我们，我们会为您补发或退款。\n感谢您的耐心等待！"
+  }
+]

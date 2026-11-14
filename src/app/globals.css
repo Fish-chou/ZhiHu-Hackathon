@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-paper: #f4f5f7;
+  --color-sheet: #ffffff;
+  --color-ink: #18212c;
+  --color-muted: #5a6472;
+  --color-rule: #d8dce2;
+  --color-cinnabar: #bf2a1e;
+  --color-cinnabar-soft: #fbe9e6;
+  --color-ochre: #9a5b0c;
+  --color-ochre-soft: #fbf0dd;
+  --color-review: #4b43a8;
+  --color-review-soft: #ecebfa;
+  --color-sage: #3f6b57;
+  --color-sage-soft: #e5f0ea;
+  --color-cite: #1f4e8c;
+
+  /* System fonts only: next/font/google needs Google Fonts at build time, which is often unreachable from mainland China. */
+  --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-serif: "Songti SC", "STSong", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", SimSun, Georgia, serif;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cite);
+  outline-offset: 2px;
+}
+
+/* The one orchestrated motion: review marks are drawn under the text when a result appears. */
+.review-mark {
+  background-image: linear-gradient(var(--mark-color, currentColor), var(--mark-color, currentColor));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 2px;
+  animation: draw-mark 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--mark-index, 0) * 120ms);
+}
+
+@keyframes draw-mark {
+  from {
+    background-size: 0% 2px;
+  }
+  to {
+    background-size: 100% 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-mark {
+    animation: none;
+  }
+}
