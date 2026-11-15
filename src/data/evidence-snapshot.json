@@ -1,7 +1,7 @@
 {
  "description": "evidence_records 离线快照：从 Supabase 原样导出，查询条件 market=Vietnam AND status=verified；不含任何新增或改写内容。其中 src/data/bulk-verified.json 列出的记录是 2026-11-14 由项目方从 candidate 批量改为 verified 的，没有逐条核对来源。",
  "exported_at": "2026-11-14T21:06:10+08:00",
- "source": "supabase:tbmgowwmhwygsqfoqwsn/evidence_records",
+ "source": "supabase:evidence_records",
  "filter": {
   "market": "Vietnam",
   "status": "verified"
