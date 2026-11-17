@@ -7,15 +7,23 @@ export type ClientOutcome =
 
 const MODES = new Set(["live", "rules_only", "no_evidence", "cached_demo"]);
 
-/** Structural check before anything is rendered: every cited id must have a verified evidence card. */
+/**
+ * Structural check before anything is rendered: every cited id must have an evidence card, and candidate
+ * cards are only accepted when the response says it was produced in demo mode.
+ */
 export function isValidAuditResponse(x: unknown): x is AuditResponse {
   const r = x as AuditResponse;
   if (!r || r.ok !== true || !MODES.has(r.mode) || !r.result || !Array.isArray(r.result.findings) || !Array.isArray(r.evidence)) {
     return false;
   }
-  if (!r.evidence.every((c) => c && c.status === "verified" && typeof c.id === "string" && typeof c.sourceUrl === "string")) {
-    return false;
-  }
+  const allowCandidates = r.meta?.evidenceMode === "demo";
+  const cardOk = (c: AuditResponse["evidence"][number]) =>
+    !!c &&
+    typeof c.id === "string" &&
+    (c.tier === "verified" || (allowCandidates && c.tier === "candidate")) &&
+    (c.sourceUrl === null || typeof c.sourceUrl === "string") &&
+    (c.tier === "candidate" || typeof c.sourceUrl === "string");
+  if (!r.evidence.every(cardOk)) return false;
   const ids = new Set(r.evidence.map((c) => c.id));
   return r.result.findings.every(
     (f) => typeof f.location === "string" && Array.isArray(f.evidence_ids) && f.evidence_ids.length > 0 && f.evidence_ids.every((id) => ids.has(id)),

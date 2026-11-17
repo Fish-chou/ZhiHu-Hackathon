@@ -38,7 +38,7 @@ export async function logAnalysisRun(
           category: res.input.contentType,
           input_text: `sha256:${digest}; chars=${res.input.text.length}`,
           model_name: res.meta.model,
-          prompt_version: res.meta.promptVersion,
+          prompt_version: `${res.meta.promptVersion}/${res.meta.evidenceMode ?? "verified_only"}`,
           status: `${res.mode}:${res.result.overall_level}`,
         },
       ],

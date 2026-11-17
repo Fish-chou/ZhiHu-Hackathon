@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import bulkVerified from "@/data/bulk-verified.json";
 import snapshotJson from "@/data/evidence-snapshot.json";
 import { isUsableEvidence, toEvidenceCard } from "@/lib/evidence-card";
-import { loadVerifiedPool, rankEvidence, searchEvidence } from "@/lib/evidence-search";
+import { loadEvidencePool, rankEvidence, searchEvidence } from "@/lib/evidence-search";
 import type { EvidenceRecord } from "@/lib/types";
 
 const snapshot = snapshotJson as unknown as { records: EvidenceRecord[] };
@@ -21,20 +21,22 @@ function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 }
 
-describe("loadVerifiedPool", () => {
+describe("loadEvidencePool (default verified_only)", () => {
   it("uses the offline verified snapshot when Supabase env vars are missing", async () => {
-    const pool = await loadVerifiedPool({ env: {}, noCache: true });
+    const pool = await loadEvidencePool({ env: {}, noCache: true });
     expect(pool.ok).toBe(true);
     if (!pool.ok) return;
     expect(pool.source).toBe("offline_snapshot");
     expect(pool.snapshotDate).toBeTruthy();
-    expect(pool.records.length).toBe(verified.length);
-    expect(pool.records.every((r) => r.status === "verified" && r.market === "Vietnam")).toBe(true);
+    expect(pool.mode).toBe("verified_only");
+    const bulk = new Set((bulkVerified as { ids: string[] }).ids);
+    expect(pool.records.length).toBe(verified.filter((r) => !bulk.has(r.id)).length);
+    expect(pool.records.every((r) => r.status === "verified" && r.market === "Vietnam" && !bulk.has(r.id))).toBe(true);
   });
 
   it("queries with market=Vietnam and status=verified and drops anything else the API returns", async () => {
     const fetchImpl = vi.fn(async () => jsonResponse([...verified.slice(0, 3), candidateFixture]));
-    const pool = await loadVerifiedPool({ env: ENV, fetchImpl: fetchImpl as unknown as typeof fetch, noCache: true });
+    const pool = await loadEvidencePool({ env: ENV, fetchImpl: fetchImpl as unknown as typeof fetch, noCache: true });
     const url = String((fetchImpl.mock.calls[0] as unknown[])[0]);
     expect(url).toContain("market=eq.Vietnam");
     expect(url).toContain("status=eq.verified");
@@ -46,13 +48,13 @@ describe("loadVerifiedPool", () => {
     const fetchImpl = vi.fn(async () => {
       throw new TypeError("fetch failed");
     });
-    const pool = await loadVerifiedPool({ env: ENV, fetchImpl: fetchImpl as unknown as typeof fetch, noCache: true });
+    const pool = await loadEvidencePool({ env: ENV, fetchImpl: fetchImpl as unknown as typeof fetch, noCache: true });
     expect(pool).toEqual({ ok: false, error: { code: "db_unavailable", message: "证据库暂时无法连接" } });
   });
 
   it("returns db_error on HTTP errors", async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({ message: "boom" }, 500));
-    const pool = await loadVerifiedPool({ env: ENV, fetchImpl: fetchImpl as unknown as typeof fetch, noCache: true });
+    const pool = await loadEvidencePool({ env: ENV, fetchImpl: fetchImpl as unknown as typeof fetch, noCache: true });
     expect(pool.ok).toBe(false);
     expect(!pool.ok && pool.error.code).toBe("db_error");
   });
@@ -61,7 +63,7 @@ describe("loadVerifiedPool", () => {
     const fetchImpl = vi.fn(async () => {
       throw new TypeError("fetch failed");
     });
-    const pool = await loadVerifiedPool({
+    const pool = await loadEvidencePool({
       env: ENV,
       fetchImpl: fetchImpl as unknown as typeof fetch,
       noCache: true,
@@ -72,7 +74,7 @@ describe("loadVerifiedPool", () => {
   });
 
   it("refuses secret keys", async () => {
-    const pool = await loadVerifiedPool({
+    const pool = await loadEvidencePool({
       env: { SUPABASE_URL: ENV.SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY: "sb_secret_abc" },
       noCache: true,
     });
@@ -122,20 +124,24 @@ describe("searchEvidence", () => {
 
 describe("toEvidenceCard", () => {
   it("labels zhihu claims as author statements and strips analyst prefixes", () => {
-    const card = toEvidenceCard(verified.find((r) => r.id === "zhihu_047")!);
+    const card = toEvidenceCard(verified.find((r) => r.id === "zhihu_047")!, "verified_only");
     expect(card.claimLabel).toBe("知乎作者称");
-    const inc = toEvidenceCard(verified.find((r) => r.id === "incident_013")!);
+    const inc = toEvidenceCard(verified.find((r) => r.id === "incident_013")!, "verified_only");
     expect(inc.analysis.riskSignal?.startsWith("analyst_inference")).toBe(false);
   });
 
   it("refuses to build a card from a non-verified row", () => {
-    expect(isUsableEvidence(candidateFixture)).toBe(false);
-    expect(() => toEvidenceCard(candidateFixture)).toThrow();
+    expect(isUsableEvidence(candidateFixture, "verified_only")).toBe(false);
+    expect(() => toEvidenceCard(candidateFixture, "verified_only")).toThrow();
   });
 
-  it("labels records that were bulk-switched to verified", () => {
-    const bulkId = (bulkVerified as { ids: string[] }).ids.find((id) => verified.some((r) => r.id === id && isUsableEvidence(r)))!;
-    expect(toEvidenceCard(verified.find((r) => r.id === bulkId)!).verification).toBe("bulk_marked");
-    expect(toEvidenceCard(verified.find((r) => r.id === "incident_013")!).verification).toBe("individual");
+  it("treats records that were bulk-switched to verified as candidates", () => {
+    const bulkId = (bulkVerified as { ids: string[] }).ids.find((id) => verified.some((r) => r.id === id && isUsableEvidence(r, "demo")))!;
+    const bulkRow = verified.find((r) => r.id === bulkId)!;
+    expect(bulkRow.status).toBe("verified");
+    expect(isUsableEvidence(bulkRow, "verified_only")).toBe(false);
+    const card = toEvidenceCard(bulkRow, "demo");
+    expect(card).toMatchObject({ tier: "candidate", tierLabel: "候选资料/待核验", dbStatus: "verified", bulkMarked: true });
+    expect(toEvidenceCard(verified.find((r) => r.id === "incident_013")!, "verified_only")).toMatchObject({ tier: "verified", bulkMarked: false });
   });
 });

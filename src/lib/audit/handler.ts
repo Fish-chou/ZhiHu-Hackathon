@@ -1,5 +1,7 @@
 import "server-only";
 import snapshotJson from "@/data/evidence-snapshot.json";
+import { isUsableEvidence } from "@/lib/evidence-card";
+import { getEvidenceMode, type EvidenceMode } from "@/lib/evidence-mode";
 import { searchEvidence } from "@/lib/evidence-search";
 import type { EvidenceRecord } from "@/lib/types";
 import { findDemoCache } from "./demo-cache";
@@ -9,19 +11,28 @@ import { runAudit, type AuditDeps } from "./run-audit";
 import { parseAuditRequest } from "./schema";
 import type { AuditErrorCode, AuditErrorResponse, AuditResponse } from "./types";
 
-const snapshotIds = new Set(
-  (snapshotJson as unknown as { records: EvidenceRecord[] }).records
-    .filter((r) => r.status === "verified" && r.market === "Vietnam")
-    .map((r) => r.id),
-);
+const snapshotRecords = (snapshotJson as unknown as { records: EvidenceRecord[] }).records;
+const allowedSnapshotIds = new Map<EvidenceMode, Set<string>>();
+
+/** Snapshot ids usable under the mode; cached demo results may only cite these. */
+export function allowedIdsFor(mode: EvidenceMode): Set<string> {
+  let ids = allowedSnapshotIds.get(mode);
+  if (!ids) {
+    ids = new Set(snapshotRecords.filter((r) => isUsableEvidence(r, mode)).map((r) => r.id));
+    allowedSnapshotIds.set(mode, ids);
+  }
+  return ids;
+}
 
 export function defaultAuditDeps(): AuditDeps {
+  const evidenceMode = getEvidenceMode();
   return {
+    evidenceMode,
     search: (params) => searchEvidence(params, { fallbackToSnapshot: true }),
     callModel: (messages) => callModel(messages),
     parseModelJson,
     findDemoCache,
-    verifiedIds: () => snapshotIds,
+    allowedEvidenceIds: () => allowedIdsFor(evidenceMode),
     now: Date.now,
   };
 }

@@ -1,9 +1,10 @@
 import "server-only";
 import snapshotJson from "@/data/evidence-snapshot.json";
-import { isBulkMarked, isUsableEvidence } from "./evidence-card";
+import { evidenceTier, isTierAllowed, isUsableEvidence } from "./evidence-card";
+import { getEvidenceMode, type EvidenceMode } from "./evidence-mode";
 import { getSupabaseConfig, SupabaseQueryError, supabaseSelect, type SupabaseConfig } from "./supabase-server";
 import { foldText } from "./text-fold";
-import { MARKET, type EvidenceRecord, type EvidenceSource } from "./types";
+import { MARKET, type EvidenceRecord, type EvidenceSource, type EvidenceTier } from "./types";
 
 interface Snapshot {
   exported_at: string;
@@ -13,7 +14,11 @@ const snapshot = snapshotJson as unknown as Snapshot;
 
 export const SNAPSHOT_EXPORTED_AT = snapshot.exported_at;
 export const MAX_EVIDENCE = 20;
+/** Candidates are leads, not proof; cap them so verified sources keep most of the model context. */
+export const MAX_CANDIDATE_EVIDENCE = 8;
 const CACHE_TTL_MS = 60_000;
+const PAGE_SIZE = 1000;
+const MAX_PAGES = 10;
 
 export type EvidenceErrorCode = "db_unavailable" | "db_error" | "config_invalid" | "unsupported_market";
 
@@ -23,18 +28,24 @@ export interface EvidenceError {
 }
 
 export interface EvidencePool {
+  mode: EvidenceMode;
   source: EvidenceSource;
   /** Export time of the offline snapshot; null when rows came live from Supabase. */
   snapshotDate: string | null;
   /** Set when Supabase was configured but failed and the snapshot was used instead. */
   fallbackReason: EvidenceErrorCode | null;
+  /** Only records whose tier the mode allows. */
   records: EvidenceRecord[];
+  /** Rows stored as verified that were left out because they were bulk-marked (verified_only mode). */
+  excludedBulkMarked: number;
 }
 
 export type PoolResult = ({ ok: true } & EvidencePool) | { ok: false; error: EvidenceError };
 
 export interface LoadOptions {
   env?: Record<string, string | undefined>;
+  /** Defaults to EVIDENCE_MODE from env. */
+  mode?: EvidenceMode;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
   /** Use the offline verified snapshot (clearly labelled) when Supabase fails. Off by default. */
@@ -53,61 +64,81 @@ function evidenceError(code: EvidenceErrorCode): { ok: false; error: EvidenceErr
   return { ok: false, error: { code, message: ERROR_MESSAGES[code] } };
 }
 
-function onlyVerifiedVietnam(rows: EvidenceRecord[]): EvidenceRecord[] {
-  return rows.filter((r) => r.status === "verified" && r.market === MARKET);
+/** Statuses requested from the database. rejected is never requested in any mode. */
+export function queriedStatuses(mode: EvidenceMode): string[] {
+  return mode === "demo" ? ["verified", "candidate"] : ["verified"];
 }
 
-function offlinePool(fallbackReason: EvidenceErrorCode | null): EvidencePool {
-  return {
-    source: "offline_snapshot",
-    snapshotDate: snapshot.exported_at,
-    fallbackReason,
-    records: onlyVerifiedVietnam(snapshot.records),
-  };
+function selectForMode(rows: EvidenceRecord[], mode: EvidenceMode): Pick<EvidencePool, "records" | "excludedBulkMarked"> {
+  const statuses = queriedStatuses(mode);
+  const inScope = rows.filter((r) => r.market === MARKET && statuses.includes(r.status));
+  const records = inScope.filter((r) => isTierAllowed(r, mode));
+  return { records, excludedBulkMarked: inScope.filter((r) => r.status === "verified" && !isTierAllowed(r, mode)).length };
 }
 
-let cache: { at: number; url: string; records: EvidenceRecord[] } | null = null;
+function offlinePool(mode: EvidenceMode, fallbackReason: EvidenceErrorCode | null): EvidencePool {
+  return { mode, source: "offline_snapshot", snapshotDate: snapshot.exported_at, fallbackReason, ...selectForMode(snapshot.records, mode) };
+}
+
+let cache: { at: number; key: string; pool: EvidencePool } | null = null;
 
 export function clearEvidenceCache() {
   cache = null;
 }
 
-/** Loads every verified Vietnam record. Status/market are filtered in the query and again in code. */
-export async function loadVerifiedPool(opts: LoadOptions = {}): Promise<PoolResult> {
+async function fetchAllRows(config: SupabaseConfig, mode: EvidenceMode, opts: LoadOptions): Promise<EvidenceRecord[]> {
+  const statuses = queriedStatuses(mode);
+  const rows: EvidenceRecord[] = [];
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const params = new URLSearchParams({
+      select: "*",
+      market: `eq.${MARKET}`,
+      status: statuses.length === 1 ? `eq.${statuses[0]}` : `in.(${statuses.join(",")})`,
+      order: "id",
+      limit: String(PAGE_SIZE),
+      offset: String(page * PAGE_SIZE),
+    });
+    const batch = await supabaseSelect<EvidenceRecord>(config, "evidence_records", params, {
+      fetchImpl: opts.fetchImpl,
+      timeoutMs: opts.timeoutMs,
+    });
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
+/**
+ * Loads the evidence the mode allows. verified_only asks the database for status=verified only;
+ * demo asks for verified and candidate. Status, market and tier are checked again in code.
+ */
+export async function loadEvidencePool(opts: LoadOptions = {}): Promise<PoolResult> {
+  const mode = opts.mode ?? getEvidenceMode(opts.env ?? process.env);
   let config: SupabaseConfig | null;
   try {
     config = getSupabaseConfig(opts.env);
   } catch {
-    return opts.fallbackToSnapshot ? { ok: true, ...offlinePool("config_invalid") } : evidenceError("config_invalid");
+    return opts.fallbackToSnapshot ? { ok: true, ...offlinePool(mode, "config_invalid") } : evidenceError("config_invalid");
   }
-  if (!config) return { ok: true, ...offlinePool(null) };
+  if (!config) return { ok: true, ...offlinePool(mode, null) };
 
-  if (!opts.noCache && cache && cache.url === config.url && Date.now() - cache.at < CACHE_TTL_MS) {
-    return { ok: true, source: "supabase", snapshotDate: null, fallbackReason: null, records: cache.records };
+  const key = `${config.url}|${mode}`;
+  if (!opts.noCache && cache && cache.key === key && Date.now() - cache.at < CACHE_TTL_MS) {
+    return { ok: true, ...cache.pool };
   }
 
-  const params = new URLSearchParams({
-    select: "*",
-    market: `eq.${MARKET}`,
-    status: "eq.verified",
-    order: "id",
-    limit: "1000",
-  });
   try {
-    const rows = await supabaseSelect<EvidenceRecord>(config, "evidence_records", params, {
-      fetchImpl: opts.fetchImpl,
-      timeoutMs: opts.timeoutMs,
-    });
-    const records = onlyVerifiedVietnam(rows);
-    if (!opts.noCache) cache = { at: Date.now(), url: config.url, records };
-    return { ok: true, source: "supabase", snapshotDate: null, fallbackReason: null, records };
+    const rows = await fetchAllRows(config, mode, opts);
+    const pool: EvidencePool = { mode, source: "supabase", snapshotDate: null, fallbackReason: null, ...selectForMode(rows, mode) };
+    if (!opts.noCache) cache = { at: Date.now(), key, pool };
+    return { ok: true, ...pool };
   } catch (err) {
     const code: EvidenceErrorCode =
       err instanceof SupabaseQueryError && (err.kind === "timeout" || err.kind === "network")
         ? "db_unavailable"
         : "db_error";
     console.error(`[evidence] Supabase query failed: ${code}`, err instanceof Error ? err.message : err);
-    return opts.fallbackToSnapshot ? { ok: true, ...offlinePool(code) } : evidenceError(code);
+    return opts.fallbackToSnapshot ? { ok: true, ...offlinePool(mode, code) } : evidenceError(code);
   }
 }
 
@@ -150,6 +181,8 @@ function makeMatcher(keyword: string): (text: string) => boolean {
 
 export interface SearchEvidenceParams {
   market?: string;
+  /** Defaults to the LoadOptions / env mode for searchEvidence, and to verified_only for rankEvidence. */
+  mode?: EvidenceMode;
   keywords: string[];
   /** Hard filter on evidence risk_category. */
   riskCategory?: string | string[];
@@ -162,16 +195,18 @@ export interface SearchEvidenceParams {
 
 export interface ScoredEvidence {
   record: EvidenceRecord;
+  tier: EvidenceTier;
   score: number;
   matchedKeywords: string[];
 }
 
 /**
- * Scores usable verified records against keywords and returns at most 20.
- * A record needs at least one hit in a source field (title, pattern, claim, quote, translation);
- * hits only in analysis fields do not qualify it.
+ * Scores the records the mode allows against keywords and returns at most 20: verified sources first,
+ * then at most 8 candidates. A record needs at least one hit in a source field (title, pattern, claim,
+ * quote, translation); hits only in analysis fields do not qualify it.
  */
 export function rankEvidence(records: EvidenceRecord[], params: SearchEvidenceParams): ScoredEvidence[] {
+  const mode = params.mode ?? "verified_only";
   const keywords = [...new Set(params.keywords.map((k) => k.trim()).filter((k) => k.length > 0))].slice(0, 80);
   if (keywords.length === 0) return [];
   const matchers = keywords.map((k) => ({ raw: k, test: makeMatcher(k) }));
@@ -180,7 +215,7 @@ export function rankEvidence(records: EvidenceRecord[], params: SearchEvidencePa
 
   const scored: ScoredEvidence[] = [];
   for (const r of records) {
-    if (!isUsableEvidence(r)) continue;
+    if (!isUsableEvidence(r, mode)) continue;
     if (categories.length && !categories.includes(r.risk_category ?? "")) continue;
     if (params.recordTypes?.length && !params.recordTypes.includes(r.record_type)) continue;
 
@@ -199,7 +234,7 @@ export function rankEvidence(records: EvidenceRecord[], params: SearchEvidencePa
     if (!primaryHit) continue;
     if (boost.has(r.risk_category ?? "")) score += 2;
     if (score < MIN_SCORE) continue;
-    scored.push({ record: r, score, matchedKeywords: [...matched] });
+    scored.push({ record: r, tier: evidenceTier(r)!, score, matchedKeywords: [...matched] });
   }
 
   scored.sort(
@@ -211,18 +246,24 @@ export function rankEvidence(records: EvidenceRecord[], params: SearchEvidencePa
 
   // Same URL with a different quote is a different provision of the same law, so it stays;
   // same URL + same quote is the same evidence and only the best-scoring row is kept.
+  // Candidates often have no URL, so their title stands in for it.
   const seenIds = new Set<string>();
   const seenSource = new Set<string>();
-  const out: ScoredEvidence[] = [];
+  const unique: ScoredEvidence[] = [];
   for (const s of scored) {
-    const sourceKey = `${s.record.source_url?.trim()}\u0000${s.record.quote_original?.trim()}`;
+    const where = s.record.source_url?.trim() || `title:${s.record.title?.trim()}`;
+    const sourceKey = `${where}\u0000${s.record.quote_original?.trim()}`;
     if (seenIds.has(s.record.id) || seenSource.has(sourceKey)) continue;
     seenIds.add(s.record.id);
     seenSource.add(sourceKey);
-    out.push(s);
-    if (out.length >= Math.min(params.limit ?? MAX_EVIDENCE, MAX_EVIDENCE)) break;
+    unique.push(s);
   }
-  return out;
+
+  const limit = Math.min(params.limit ?? MAX_EVIDENCE, MAX_EVIDENCE);
+  const candidates = unique.filter((s) => s.tier === "candidate");
+  const candidateSlots = Math.min(candidates.length, MAX_CANDIDATE_EVIDENCE, limit);
+  const verified = unique.filter((s) => s.tier === "verified").slice(0, limit - candidateSlots);
+  return [...verified, ...candidates.slice(0, candidateSlots)];
 }
 
 export type SearchEvidenceResult =
@@ -231,50 +272,49 @@ export type SearchEvidenceResult =
 
 export async function searchEvidence(params: SearchEvidenceParams, opts: LoadOptions = {}): Promise<SearchEvidenceResult> {
   if ((params.market ?? MARKET) !== MARKET) return evidenceError("unsupported_market");
-  const pool = await loadVerifiedPool(opts);
+  const pool = await loadEvidencePool({ ...opts, mode: params.mode ?? opts.mode });
   if (!pool.ok) return pool;
-  return {
-    ok: true,
-    source: pool.source,
-    snapshotDate: pool.snapshotDate,
-    fallbackReason: pool.fallbackReason,
-    results: rankEvidence(pool.records, params),
-    poolSize: pool.records.length,
-  };
+  const { records, ...meta } = pool;
+  return { ...meta, results: rankEvidence(records, { ...params, mode: pool.mode }), poolSize: records.length };
 }
 
 export interface EvidenceStats {
+  mode: EvidenceMode;
   source: EvidenceSource;
   snapshotDate: string | null;
   fallbackReason: EvidenceErrorCode | null;
+  /** Records the mode loads, before the completeness check. */
   total: number;
-  usable: number;
-  /** Usable records that were switched to verified in bulk without a per-record source check. */
-  bulkMarked: number;
-  byRecordType: Record<string, number>;
-  byRiskCategory: Record<string, number>;
+  usable: { verified: number; candidate: number };
+  /** Usable candidates that are bulk-marked verified rows. */
+  bulkMarkedUsable: number;
+  /** Stored-as-verified rows left out because they were bulk-marked (verified_only mode). */
+  excludedBulkMarked: number;
+  byRecordType: Record<string, { verified: number; candidate: number }>;
 }
 
-export async function getVerifiedEvidenceStats(opts: LoadOptions = {}): Promise<
-  ({ ok: true } & EvidenceStats) | { ok: false; error: EvidenceError }
-> {
-  const pool = await loadVerifiedPool({ fallbackToSnapshot: true, ...opts });
+export async function getEvidenceStats(opts: LoadOptions = {}): Promise<({ ok: true } & EvidenceStats) | { ok: false; error: EvidenceError }> {
+  const pool = await loadEvidencePool({ fallbackToSnapshot: true, ...opts });
   if (!pool.ok) return pool;
-  const usable = pool.records.filter(isUsableEvidence);
-  const count = (key: (r: EvidenceRecord) => string) =>
-    usable.reduce<Record<string, number>>((acc, r) => {
-      acc[key(r)] = (acc[key(r)] ?? 0) + 1;
-      return acc;
-    }, {});
+  const usable = pool.records.filter((r) => isUsableEvidence(r, pool.mode));
+  const byRecordType: EvidenceStats["byRecordType"] = {};
+  for (const r of usable) {
+    const row = (byRecordType[r.record_type] ??= { verified: 0, candidate: 0 });
+    row[evidenceTier(r)!]++;
+  }
   return {
     ok: true,
+    mode: pool.mode,
     source: pool.source,
     snapshotDate: pool.snapshotDate,
     fallbackReason: pool.fallbackReason,
     total: pool.records.length,
-    usable: usable.length,
-    bulkMarked: usable.filter((r) => isBulkMarked(r.id)).length,
-    byRecordType: count((r) => r.record_type),
-    byRiskCategory: count((r) => r.risk_category ?? "other"),
+    usable: {
+      verified: usable.filter((r) => evidenceTier(r) === "verified").length,
+      candidate: usable.filter((r) => evidenceTier(r) === "candidate").length,
+    },
+    bulkMarkedUsable: usable.filter((r) => r.status === "verified" && evidenceTier(r) === "candidate").length,
+    excludedBulkMarked: pool.excludedBulkMarked,
+    byRecordType,
   };
 }

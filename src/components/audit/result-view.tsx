@@ -127,6 +127,9 @@ export function ResultView({
                       <span className="text-muted">{CATEGORY_LABELS[f.risk_category]}</span>
                       {f.requires_human_review && <span className="rounded bg-cinnabar-soft px-1.5 py-0.5 text-xs text-cinnabar">需人工复核</span>}
                     </div>
+                    {f.evidence_basis === "candidate_only" && (
+                      <p className="mt-2 text-xs text-ochre">这条判断只有候选资料（待核验）支持，已统一列为待人工复核。</p>
+                    )}
 
                     <blockquote className="mt-3 border-l-2 border-rule pl-3 font-serif text-[15px] leading-7">
                       {f.location_match === "none" && <span className="mr-1 font-sans text-xs text-muted">未能在原文中定位：</span>}
@@ -161,7 +164,12 @@ export function ResultView({
                               >
                                 <span className="mt-0.5 shrink-0 rounded border border-rule px-1.5 text-xs text-muted">{c.recordTypeLabel}</span>
                                 <span className="text-cite underline decoration-cite/30 underline-offset-4">{c.title}</span>
-                                {c.verification === "bulk_marked" && <span className="shrink-0 text-xs text-ochre">未逐条核对</span>}
+                                <span
+                                  data-evidence-tier={c.tier}
+                                  className={`shrink-0 text-xs ${c.tier === "verified" ? "text-sage" : "text-ochre"}`}
+                                >
+                                  {c.tierLabel}
+                                </span>
                                 {c.lowConfidence && <span className="shrink-0 text-xs text-ochre">置信度低</span>}
                               </button>
                             </li>
@@ -188,7 +196,10 @@ export function ResultView({
 
           <div className="border-t border-rule pt-4 text-xs leading-6 text-muted">
             <p>
-              检索到 {data.meta.retrievedCount} 条已核验证据，引用 {data.evidence.length} 条；证据来源：
+              {data.meta.evidenceMode === "demo" && data.meta.retrievedByTier
+                ? `演示模式：检索到 ${data.meta.retrievedCount} 条证据（已核验来源 ${data.meta.retrievedByTier.verified} 条、候选资料/待核验 ${data.meta.retrievedByTier.candidate} 条），引用 ${data.evidence.length} 条`
+                : `检索到 ${data.meta.retrievedCount} 条已核验证据，引用 ${data.evidence.length} 条`}
+              ；证据来源：
               {data.meta.evidenceSource === "supabase" ? "Supabase 证据库（实时）" : `离线证据快照（导出于 ${data.meta.snapshotDate?.slice(0, 10)}）`}。
             </p>
             {signals.length > 0 && <p>命中的风险信号：{signals.join("、")}。</p>}

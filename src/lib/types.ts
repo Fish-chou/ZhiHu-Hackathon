@@ -9,6 +9,7 @@ export const RECORD_TYPE_LABELS: Record<string, string> = {
   zhihu: "知乎内容",
   marketplace: "电商样本",
   user_feedback: "用户反馈",
+  market_insight: "市场资料",
 };
 
 export const RISK_CATEGORY_LABELS: Record<string, string> = {
@@ -19,7 +20,20 @@ export const RISK_CATEGORY_LABELS: Record<string, string> = {
   product: "产品表达",
   aftersale: "售后",
   logistics: "物流",
+  compliance: "合规",
+  market: "市场",
   other: "其他",
+};
+
+/**
+ * verified: status=verified and checked record by record.
+ * candidate: status=candidate, or switched to verified in bulk without a per-record source check.
+ */
+export type EvidenceTier = "verified" | "candidate";
+
+export const EVIDENCE_TIER_LABELS: Record<EvidenceTier, string> = {
+  verified: "已核验来源",
+  candidate: "候选资料/待核验",
 };
 
 /** One row of the Supabase `evidence_records` table. Every column is nullable text in the database. */
@@ -63,7 +77,7 @@ export interface EvidenceRecord {
 /** Where the evidence pool came from for a given request. */
 export type EvidenceSource = "supabase" | "offline_snapshot";
 
-/** Display-ready evidence for the source card. Only ever built from verified Vietnam records. */
+/** Display-ready evidence for the source card. Built only from records the current evidence mode allows. */
 export interface EvidenceCard {
   id: string;
   recordType: string;
@@ -71,10 +85,13 @@ export interface EvidenceCard {
   title: string;
   sourceTitle: string | null;
   sourceType: string | null;
-  sourceUrl: string;
+  /** Candidates may come without a source link. */
+  sourceUrl: string | null;
   publishedAt: string | null;
   accessedAt: string | null;
   quoteOriginal: string;
+  /** 原文短引, or 原始资料行 when a candidate has no usable quote and its raw data row is shown instead. */
+  quoteLabel: string;
   translationZh: string | null;
   /** How the claim must be framed, e.g. 来源记载 / 该规则文本规定 / 知乎作者称. */
   claimLabel: string;
@@ -88,7 +105,10 @@ export interface EvidenceCard {
   riskCategoryLabel: string | null;
   confidence: string | null;
   lowConfidence: boolean;
-  status: "verified";
-  /** individual: checked against the source record by record. bulk_marked: switched to verified in bulk without that check. */
-  verification: "individual" | "bulk_marked";
+  tier: EvidenceTier;
+  tierLabel: string;
+  /** The status stored in the database, shown as-is. It is never changed by this app. */
+  dbStatus: "verified" | "candidate";
+  /** Stored as verified, but switched from candidate in bulk without a per-record source check; treated as a candidate. */
+  bulkMarked: boolean;
 }

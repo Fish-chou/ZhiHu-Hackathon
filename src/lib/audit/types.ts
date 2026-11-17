@@ -1,3 +1,4 @@
+import type { EvidenceMode } from "@/lib/evidence-mode";
 import type { EvidenceCard, EvidenceSource } from "@/lib/types";
 
 export const CONTENT_TYPES = ["advertisement", "product_page", "customer_service"] as const;
@@ -25,7 +26,13 @@ export const LEVEL_LABELS: Record<Level, string> = {
 export const MAX_TEXT_LENGTH = 3000;
 export const DISCLAIMER = "结果仅作发布前风险提示，不构成法律意见";
 export const NO_EVIDENCE_SUMMARY = "未找到可核验依据，建议进行人工确认。";
-export const PROMPT_VERSION = "audit-v2";
+export const PROMPT_VERSION = "audit-v3";
+
+/**
+ * verified: cites at least one verified source and no candidates. mixed: verified sources plus candidates.
+ * candidate_only: cites only candidates, so severity is forced to needs_review.
+ */
+export type EvidenceBasis = "verified" | "mixed" | "candidate_only";
 
 export interface AuditFinding {
   id: string;
@@ -39,6 +46,8 @@ export interface AuditFinding {
   /** exact: verbatim in the input; approx: mapped to the closest sentence; none: could not be located. */
   location_match: "exact" | "approx" | "none";
   source: "model" | "rules";
+  /** Absent on results generated before evidence modes existed; those cite verified sources only. */
+  evidence_basis?: EvidenceBasis;
 }
 
 export interface AuditResult {
@@ -74,10 +83,13 @@ export interface AuditResponse {
   evidence: EvidenceCard[];
   signals: MatchedSignal[];
   meta: {
+    /** Absent on results generated before evidence modes existed (treated as verified_only). */
+    evidenceMode?: EvidenceMode;
     evidenceSource: EvidenceSource;
     snapshotDate: string | null;
     fallbackReason: string | null;
     retrievedCount: number;
+    retrievedByTier?: { verified: number; candidate: number };
     model: string | null;
     promptVersion: string;
     generatedAt: string;
@@ -85,7 +97,7 @@ export interface AuditResponse {
     cachedAt?: string;
     demoId?: string;
     notices: string[];
-    removed: { invalidEvidenceIds: string[]; droppedFindings: number; sanitizedPhrases: number };
+    removed: { invalidEvidenceIds: string[]; droppedFindings: number; sanitizedPhrases: number; downgradedFindings?: number };
   };
 }
 

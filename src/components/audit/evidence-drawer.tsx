@@ -56,11 +56,12 @@ export function EvidenceDrawer({ card, onClose }: { card: EvidenceCard | null; o
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="rounded bg-ink px-1.5 py-0.5 text-white">{card.recordTypeLabel}</span>
-              {card.verification === "bulk_marked" ? (
-                <span className="rounded border border-ochre px-1.5 py-0.5 text-ochre">批量标记，未逐条核对来源</span>
-              ) : (
-                <span className="rounded border border-sage px-1.5 py-0.5 text-sage">已核验</span>
-              )}
+              <span
+                data-evidence-tier={card.tier}
+                className={`rounded border px-1.5 py-0.5 ${card.tier === "verified" ? "border-sage text-sage" : "border-ochre bg-ochre-soft text-ochre"}`}
+              >
+                {card.tierLabel}
+              </span>
               {card.confidence && (
                 <span className={`rounded border px-1.5 py-0.5 ${card.lowConfidence ? "border-ochre text-ochre" : "border-rule text-muted"}`}>
                   置信度{CONFIDENCE_LABEL[card.confidence] ?? card.confidence}
@@ -83,29 +84,36 @@ export function EvidenceDrawer({ card, onClose }: { card: EvidenceCard | null; o
             {card.publishedAt && <p>来源日期：{card.publishedAt}</p>}
             {card.accessedAt && <p>数据侧访问日期：{card.accessedAt}</p>}
             {isZhihu && card.authorName && <p>作者（页面显示名）：{card.authorName}</p>}
-            <p className="mt-1">
-              <a
-                href={card.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded border border-cite px-3 py-1.5 text-sm font-medium text-cite hover:bg-cite hover:text-white"
-              >
-                查看原文
-              </a>
-              <span className="ml-2 break-all text-xs">{hostOf(card.sourceUrl)}</span>
-            </p>
+            {card.sourceUrl ? (
+              <p className="mt-1">
+                <a
+                  href={card.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded border border-cite px-3 py-1.5 text-sm font-medium text-cite hover:bg-cite hover:text-white"
+                >
+                  查看原文
+                </a>
+                <span className="ml-2 break-all text-xs">{hostOf(card.sourceUrl)}</span>
+              </p>
+            ) : (
+              <p className="mt-1 text-ochre">无来源链接：数据侧没有提供这条资料的原始链接，无法打开原文核对。</p>
+            )}
           </div>
 
-          {card.verification === "bulk_marked" && (
+          {card.tier === "candidate" && (
             <p className="rounded-md bg-ochre-soft px-3 py-2 text-sm leading-6 text-ochre">
-              这条记录原为候选（candidate），2026-11-14 由项目方批量改为 verified，没有逐条核对来源。它当初没有通过核验的原因记录在下方的核验备注里，请谨慎参考。
+              {card.bulkMarked
+                ? "这条记录在数据库中的状态是 verified，但它原为候选（candidate），2026-11-14 由项目方批量改为 verified，没有逐条核对来源，因此本系统按候选资料处理。它当初没有通过核验的原因记录在下方的核验备注里。"
+                : "这是候选资料，数据库状态为 candidate，尚未核验来源。"}
+              只能作为线索参考，不能单独支撑风险判断；只引用候选资料的判断一律列为待人工复核。
             </p>
           )}
           {card.lowConfidence && (
             <p className="rounded-md bg-ochre-soft px-3 py-2 text-sm text-ochre">这条证据的置信度为低，只能作为参考，不能单独支撑判断。</p>
           )}
 
-          <Block title="原文短引">
+          <Block title={card.quoteLabel}>
             <blockquote className="border-l-2 border-rule pl-3 font-serif">{card.quoteOriginal}</blockquote>
           </Block>
           {card.translationZh && card.translationZh !== card.quoteOriginal && <Block title="中文译文">{card.translationZh}</Block>}

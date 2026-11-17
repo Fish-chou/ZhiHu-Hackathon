@@ -1,13 +1,18 @@
 // Generates src/data/demo/demo-results.json by calling a running instance of the app.
 // Usage: node scripts/generate-demo-cache.mjs [baseUrl]    (default http://localhost:3000)
-// Every cached result comes from the same /api/audit pipeline the site uses; nothing is written by hand.
+// The app must run with EVIDENCE_MODE=verified_only, so the cache cites only individually verified sources
+// and can be shown safely in either mode. Every cached result comes from the same /api/audit pipeline the
+// site uses; nothing is written by hand.
 import { readFile, writeFile } from "node:fs/promises";
 
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/+$/, "");
 const root = new URL("../", import.meta.url);
 const demos = JSON.parse(await readFile(new URL("src/data/demo/demo-cases.json", root), "utf8"));
 const snapshot = JSON.parse(await readFile(new URL("src/data/evidence-snapshot.json", root), "utf8"));
-const verified = new Set(snapshot.records.filter((r) => r.status === "verified" && r.market === "Vietnam").map((r) => r.id));
+const bulk = new Set(JSON.parse(await readFile(new URL("src/data/bulk-verified.json", root), "utf8")).ids);
+const verified = new Set(
+  snapshot.records.filter((r) => r.status === "verified" && r.market === "Vietnam" && !bulk.has(r.id)).map((r) => r.id),
+);
 
 const out = {};
 let failed = false;
@@ -23,6 +28,11 @@ for (const d of demos) {
     failed = true;
     continue;
   }
+  if (body.meta.evidenceMode !== "verified_only") {
+    console.error(`✗ ${d.id}: evidenceMode=${body.meta.evidenceMode} — run the app with EVIDENCE_MODE=verified_only`);
+    failed = true;
+    continue;
+  }
   // A cached result must be a real model run, or an honest "no evidence" answer. Fallback modes are not cached.
   if (!["live", "no_evidence"].includes(body.mode)) {
     console.error(`✗ ${d.id}: mode=${body.mode} (${body.meta.notices.join(" ")}) — not cached`);
@@ -30,9 +40,9 @@ for (const d of demos) {
     continue;
   }
   const evidenceIds = [...new Set(body.result.findings.flatMap((f) => f.evidence_ids))];
-  const bad = evidenceIds.filter((id) => !verified.has(id));
+  const bad = [...evidenceIds.filter((id) => !verified.has(id)), ...body.evidence.filter((c) => c.tier !== "verified").map((c) => c.id)];
   if (bad.length) {
-    console.error(`✗ ${d.id}: cites ids not in the verified snapshot: ${bad.join(", ")}`);
+    console.error(`✗ ${d.id}: cites ids that are not individually verified: ${[...new Set(bad)].join(", ")}`);
     failed = true;
     continue;
   }

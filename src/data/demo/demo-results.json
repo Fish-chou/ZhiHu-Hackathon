@@ -1,16 +1,16 @@
 {
  "map-store-locator": {
   "demoId": "map-store-locator",
-  "generatedAt": "2026-11-14T13:08:07.525Z",
+  "generatedAt": "2026-11-17T03:19:53.597Z",
   "contentType": "product_page",
   "text": "【门店查询】\n全新上线！打开地图即可找到离你最近的门店，覆盖河内、胡志明市、岘港等城市。\n地图数据由第三方地图服务商提供，海域及岛屿名称沿用服务商默认标注（Xisha、Nansha）。\n同款门店地图已同步上线品牌 App，扫码即可下载。",
   "evidenceIds": [
+   "risk_006",
    "risk_007",
    "incident_013",
-   "risk_006",
    "incident_016",
-   "incident_031",
-   "incident_014"
+   "incident_014",
+   "incident_008"
   ],
   "evidenceSource": "supabase",
   "model": "deepseek-flash",
@@ -24,7 +24,7 @@
    },
    "result": {
     "overall_level": "high",
-    "summary": "待审内容在门店地图说明中直接使用“Xisha、Nansha”标注海域及岛屿名称，与已核验证据中记载的命名方式及多起已产生公开道歉、移除地图、下架或处罚后果的事件机制相符，需在发布前人工复核并修改。",
+    "summary": "待审内容在门店地图说明中直接使用“Xisha、Nansha”标注海域及岛屿名称，与已核验的官方表述及多起已记载后果的地图事件机制相符，属于发布前需重点处理的地图与领土表述风险；同时“扫码即可下载”的App导流表述需与App内地图一并复核。",
     "findings": [
      {
       "id": "finding_001",
@@ -32,126 +32,60 @@
       "location_match": "exact",
       "risk_category": "geopolitical",
       "severity": "high",
-      "reason": "待审内容本身即写明地图对相关群岛使用“Xisha、Nansha”标注。证据 risk_007 记载越南官方英文表述逐字使用“Hoang Sa (Paracel) and Truong Sa (Spratly)”，并记载某第三方地图因未标注这两个名称、把群岛标为其他名称而被撤下；incident_013 记载雅迪越南因官网门店地图仅以中文“Xisha”“Nansha”标注而公开道歉、移除地图图像并下线门店查询功能整改。仅凭内容本身即与该机制相符，不依赖外部事实。",
-      "evidence_ids": [
-       "risk_007",
-       "incident_013"
-      ],
-      "recommendation": "发布前由人工复核地图标注；建议不沿用服务商默认标注，改为符合当地表述的名称，或在该功能上线前移除相关海域与岛屿标注并保留可核查的底图来源说明。改写示例：“地图数据由第三方地图服务商提供，相关标注正在复核中。”",
-      "requires_human_review": true,
-      "source": "model"
-     },
-     {
-      "id": "finding_002",
-      "location": "打开地图即可找到离你最近的门店",
-      "location_match": "exact",
-      "risk_category": "geopolitical",
-      "severity": "medium",
-      "reason": "该句表明详情页将嵌入可交互地图，底图与标注由第三方服务商决定。risk_006 记载该规则文本规定国界与领土主权应在测绘产品与地图出版物上准确表示，并对未表示或未准确表示国家主权/国界线的地图出版物设有罚款、召回与销毁措施；incident_016 记载 Grab 越南因 App 地图未完整显示相关群岛被行政处罚并要求整改；incident_031 记载某品牌 App 争议地图被移除、下载链接关闭。是否构成问题取决于实际底图内容，需看图片与实际渲染结果。",
+      "reason": "该规则文本规定国界与领土主权应在测绘产品与地图出版物上准确表示（risk_006）；已核验来源记载越南官方英文表述逐字使用“Hoang Sa (Paracel) and Truong Sa (Spratly)”，并记录某第三方地图未标注这两个名称、把群岛标为其他名称后被撤下（risk_007）。已核验案例记载雅迪越南因官网门店地图仅以中文“Xisha”“Nansha”标注相关群岛而公开道歉、移除地图图像并下线门店查询功能整改（incident_013）；另有Grab App地图因未完整显示相关群岛被行政处罚并要求整改（incident_016）。待审内容在门店查询说明中主动写明沿用“Xisha、Nansha”默认标注，仅凭文本本身即与上述已记载的机制相符。",
       "evidence_ids": [
        "risk_006",
-       "incident_016",
-       "incident_031"
-      ],
-      "recommendation": "对越南区实际渲染的门店地图逐级缩放截图留档并人工复核，确认底图来源与标注；建议为越南市场单独配置底图或关闭争议图层，并保留复核记录。",
-      "requires_human_review": true,
-      "source": "model"
-     },
-     {
-      "id": "finding_003",
-      "location": "同款门店地图已同步上线品牌 App，扫码即可下载。",
-      "location_match": "exact",
-      "risk_category": "platform",
-      "severity": "medium",
-      "reason": "该句将地图风险延伸至 App 下载入口。incident_014 记载某品牌因在 Facebook 专页提供通往含九段线图像 App 的链接而被行政处罚并已履行；incident_031 记载某品牌 App 在越南应用商店不可下载、争议地图与下载链接被移除。风险是否成立取决于 App 内实际地图内容，属内容之外的事实。",
-      "evidence_ids": [
-       "incident_014",
-       "incident_031"
-      ],
-      "recommendation": "在 App 内地图完成人工复核并确认标注前，建议暂缓在详情页放置扫码下载入口，或改为不指向地图功能的下载说明；上线前对 App 内各入口地图逐一截图复核。",
-      "requires_human_review": true,
-      "source": "model"
-     },
-     {
-      "id": "finding_004",
-      "location": "地图数据由第三方地图服务商提供",
-      "location_match": "exact",
-      "risk_category": "geopolitical",
-      "severity": "medium",
-      "reason": "该句将标注责任归于第三方服务商。incident_013 记载雅迪越南声明承认与建站及地图服务商合作导致问题并公开道歉、移除地图；incident_016 记载 Grab 称与地图数据提供方合作核查更新但仍被处罚。以第三方来源作为说明，不改变内容本身需复核的状态。",
-      "evidence_ids": [
+       "risk_007",
        "incident_013",
        "incident_016"
       ],
-      "recommendation": "建议补充可核查的底图来源与版本信息，并在发布前完成人工复核；不宜仅以“服务商默认标注”作为免责表述，可改为“地图标注以复核后的版本为准”。",
+      "recommendation": "删除对“Xisha、Nansha”默认标注的说明，并在地图上线前逐项核对底图对相关群岛及海域的命名与标注；建议改为不含具体地名标注说明的中性表述，例如“地图数据由第三方地图服务商提供，具体标注以复核后的版本为准”，并在发布前由人工对地图截图逐处复核。",
       "requires_human_review": true,
-      "source": "model"
+      "source": "model",
+      "evidence_basis": "verified"
+     },
+     {
+      "id": "finding_002",
+      "location": "同款门店地图已同步上线品牌 App，扫码即可下载。",
+      "location_match": "exact",
+      "risk_category": "geopolitical",
+      "severity": "high",
+      "reason": "已核验案例记载Chagee越南因在Facebook专页提供通往其App的链接、该App显示含九段线的图像而被作出行政处罚（incident_014）；另有案例记载iME官网使用含九段线地图后公开道歉并承诺更换（incident_008）。待审内容以“扫码即可下载”把用户导向内嵌同款门店地图的App，风险随链接与App内地图一并转移，仅凭文本即可判断需在发布前复核App内地图。",
+      "evidence_ids": [
+       "incident_014",
+       "incident_008"
+      ],
+      "recommendation": "在确认App内门店地图已完成地名与边界标注复核前，暂缓在详情页放置“扫码即可下载”的导流表述；复核通过后再上线，并保留复核记录。",
+      "requires_human_review": true,
+      "source": "model",
+      "evidence_basis": "verified"
+     },
+     {
+      "id": "finding_003",
+      "location": "打开地图即可找到离你最近的门店，覆盖河内、胡志明市、岘港等城市。",
+      "location_match": "exact",
+      "risk_category": "geopolitical",
+      "severity": "needs_review",
+      "reason": "该规则文本规定地图出版物应准确表示国界与领土主权（risk_006），已核验案例显示门店地图类内容曾引发公开道歉与功能下线（incident_013）。但待审文本本身未展示地图图像，仅凭文字无法判断底图实际绘制与标注情况，需要人工查看图片后复核。",
+      "evidence_ids": [
+       "risk_006",
+       "incident_013"
+      ],
+      "recommendation": "提取详情页实际展示的地图截图，由人工逐处核对国界线、海域及岛屿名称标注后再决定是否发布；如无法核对，建议先不上线地图展示模块。",
+      "requires_human_review": true,
+      "source": "model",
+      "evidence_basis": "verified"
      }
     ],
     "missing_evidence": [
-     "现有证据未包含该第三方地图服务商在越南区的实际底图与标注渲染结果，无法判断实际显示内容。",
-     "现有证据未包含该门店地图与 App 内地图的截图或图片，无法核实是否存在海域虚线等图形要素。",
-     "现有证据未包含该商品详情页在越南区的可见性配置（如是否按 IP 区分展示）。"
+     "待审内容未提供地图图片或底图截图，无法确认实际绘制范围、国界线与岛礁标注情况",
+     "未提供第三方地图服务商名称及其对相关海域、岛屿的标注版本信息",
+     "未提供品牌App内门店地图的实际界面与标注内容",
+     "未找到针对“门店查询”类功能本身的已核验官方规则文本，仅有地图与领土表示相关规则及案例"
     ],
     "disclaimer": "结果仅作发布前风险提示，不构成法律意见"
    },
    "evidence": [
-    {
-     "id": "risk_007",
-     "recordType": "risk_rule",
-     "recordTypeLabel": "风险信号",
-     "title": "越南官方英文表述中的两处群岛名称及其英文括注",
-     "sourceTitle": "Remarks by the Spokesperson of the Ministry of Foreign Affairs of Viet Nam Le Thi Thu Hang regarding the 5th Anniversary of the Final Award issued by the Arbitral Tribunal in the South China Sea Arbitration",
-     "sourceType": "official",
-     "sourceUrl": "https://vnembassy-thehague.mofa.gov.vn/web/ministry-of-foreign-affairs/detail/chi-tiet/remarks-by-the-spokesperson-of-the-ministry-of-foreign-affairs-of-viet-nam-le-thi-thu-hang-regarding-the-the-5th-anniversary-of-the-final-award-issued-by-the-arbitral-tribunal-in-the-south-china-sea-arbitration-55.html",
-     "publishedAt": "2021-07-12",
-     "accessedAt": "2026-11-14",
-     "quoteOriginal": "On this occasion, Viet Nam also reaffirms its principled position on the issues of sovereignty over Hoang Sa (Paracel) and Truong Sa (Spratly) Islands, and the maritime zones under the sovereignty, sovereign rights and jurisdiction of Viet Nam as defined in accordance with the Convention./.",
-     "translationZh": "值此之际，越南亦重申其对 Hoang Sa（Paracel）与 Truong Sa（Spratly）群岛主权问题、以及依《公约》确定的越南管辖海域的原则立场。",
-     "claimLabel": "依据",
-     "claim": "越南外交部官网与越南之声英文报道逐字使用 “Hoang Sa (Paracel) and Truong Sa (Spratly)”；VTC News 事件报道记录某第三方地图未标注这两个名称、并把群岛标为其他名称，随后被撤下。本条仅记录来源中出现的命名方式与已报道事件。",
-     "consequence": null,
-     "analysis": {
-      "riskSignal": null,
-      "recommendedAction": "地图/文案是否需并列多语种地名？地名表来源为何？是否需按《测绘与地图法》第20条标准化地名核对？"
-     },
-     "notes": "误报风险与限制：不同来源对同一地理对象使用不同名称是普遍现象；单一名词出现不构成风险。不得据名称推断作者国籍、所在地或身份。 | 适用语境：地图注记; 地名表; 旅游文案; 物流与航海描述 | 来源性质：越南外交部（驻荷兰使馆官网）官方声明 | 元素类别：国家、地区和民族称谓 / 地理符号 | 仅提示人工复核，不自动判定违规、违法或冒犯；不作地图、边界或符号的政治含义判断",
-     "authorName": null,
-     "riskCategory": "language",
-     "riskCategoryLabel": "语言",
-     "confidence": "high",
-     "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
-    },
-    {
-     "id": "incident_013",
-     "recordType": "incident",
-     "recordTypeLabel": "真实案例",
-     "title": "Yadea Vietnam（雅迪电动车越南公司）官网门店地图｜map",
-     "sourceTitle": "Using map that violates Vietnam's sovereignty was a mistake: Yadea Vietnam",
-     "sourceType": "media",
-     "sourceUrl": "https://e.vnexpress.vn/news/business/companies/using-map-that-violates-vietnam-s-sovereignty-was-a-mistake-yadea-vietnam-4748303.html",
-     "publishedAt": "页面未显示具体日期（正文述“周一”回应、截图标注 2024-05-19）",
-     "accessedAt": "2026-11-14T16:49:36+08:00",
-     "quoteOriginal": "We admit to making a severe mistake by partnering with service providers responsible for building the website and providing the map that caused the recent issue. We sincerely apologize for this mistake.",
-     "translationZh": "我们承认犯下严重错误：与负责建站和提供地图的服务商合作，导致了近期的问题。我们为此真诚道歉。（雅迪越南声明）",
-     "claimLabel": "来源记载",
-     "claim": "雅迪越南发表声明，承认在网站建设服务商与地图供应商的合作上“犯下严重错误”，导致官网门店地图将越南黄沙（Hoàng Sa）、长沙（Trường Sa）群岛仅以中文“Xisha”“Nansha”标注；公司称已审查并移除网站上的不当地图图像，并表示在确认数据符合越南法律前不再开放该功能（VnExpress International、Tuoi Tre News 均逐字引用该声明）。",
-     "consequence": "公司公开道歉并移除官网地图图像；门店查询功能下线整改（两家独立媒体逐字引用公司声明并载明功能不可访问）。行政处罚：本次未找到，不记录。",
-     "analysis": {
-      "riskSignal": "第三方地图/建站供应商提供的底图，对争议地名的标注语言与他国一致；地名仅用中文、无当地语言版本；地图仅对境外 IP 可见（本地测试漏检）。",
-      "recommendedAction": "把“地图供应商”纳入合规审查清单，要求提供地名标注规范；用境外 IP 与本地 IP 双视角测试；对群岛/边界地名建立禁用词与替换表；合同中写入地图合规责任条款。"
-     },
-     "notes": "1) 两篇页面均未显示明确发布日期，事件日由“周六/周日”与截图标注推定；2) 公司声明的原始发布渠道（官网/新闻稿）未打开，依据两家媒体逐字引用；3) 是否被处罚、处罚金额未找到；4) 不含销量影响数据。",
-     "authorName": null,
-     "riskCategory": "geopolitical",
-     "riskCategoryLabel": "地缘政治",
-     "confidence": "high",
-     "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
-    },
     {
      "id": "risk_006",
      "recordType": "risk_rule",
@@ -163,6 +97,7 @@
      "publishedAt": "2018-06-14",
      "accessedAt": "2026-11-14",
      "quoteOriginal": "The national boundaries and territorial sovereignty shall be accurately represented on survey and mapping products and map publications.",
+     "quoteLabel": "原文短引",
      "translationZh": "国界与领土主权应在测绘产品与地图出版物上准确表示。",
      "claimLabel": "依据",
      "claim": "《测绘与地图法》第18条要求测绘产品与地图出版物准确表示国界与领土主权，并规定使用标准国界地图；第18/2020/ND-CP号法令第10、11条对未表示或未准确表示国家主权/国界线的地图出版物流通、出版及跨境交换设有罚款、召回与销毁措施。",
@@ -177,8 +112,72 @@
      "riskCategoryLabel": "地缘政治",
      "confidence": "high",
      "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "risk_007",
+     "recordType": "risk_rule",
+     "recordTypeLabel": "风险信号",
+     "title": "越南官方英文表述中的两处群岛名称及其英文括注",
+     "sourceTitle": "Remarks by the Spokesperson of the Ministry of Foreign Affairs of Viet Nam Le Thi Thu Hang regarding the 5th Anniversary of the Final Award issued by the Arbitral Tribunal in the South China Sea Arbitration",
+     "sourceType": "official",
+     "sourceUrl": "https://vnembassy-thehague.mofa.gov.vn/web/ministry-of-foreign-affairs/detail/chi-tiet/remarks-by-the-spokesperson-of-the-ministry-of-foreign-affairs-of-viet-nam-le-thi-thu-hang-regarding-the-the-5th-anniversary-of-the-final-award-issued-by-the-arbitral-tribunal-in-the-south-china-sea-arbitration-55.html",
+     "publishedAt": "2021-07-12",
+     "accessedAt": "2026-11-14",
+     "quoteOriginal": "On this occasion, Viet Nam also reaffirms its principled position on the issues of sovereignty over Hoang Sa (Paracel) and Truong Sa (Spratly) Islands, and the maritime zones under the sovereignty, sovereign rights and jurisdiction of Viet Nam as defined in accordance with the Convention./.",
+     "quoteLabel": "原文短引",
+     "translationZh": "值此之际，越南亦重申其对 Hoang Sa（Paracel）与 Truong Sa（Spratly）群岛主权问题、以及依《公约》确定的越南管辖海域的原则立场。",
+     "claimLabel": "依据",
+     "claim": "越南外交部官网与越南之声英文报道逐字使用 “Hoang Sa (Paracel) and Truong Sa (Spratly)”；VTC News 事件报道记录某第三方地图未标注这两个名称、并把群岛标为其他名称，随后被撤下。本条仅记录来源中出现的命名方式与已报道事件。",
+     "consequence": null,
+     "analysis": {
+      "riskSignal": null,
+      "recommendedAction": "地图/文案是否需并列多语种地名？地名表来源为何？是否需按《测绘与地图法》第20条标准化地名核对？"
+     },
+     "notes": "误报风险与限制：不同来源对同一地理对象使用不同名称是普遍现象；单一名词出现不构成风险。不得据名称推断作者国籍、所在地或身份。 | 适用语境：地图注记; 地名表; 旅游文案; 物流与航海描述 | 来源性质：越南外交部（驻荷兰使馆官网）官方声明 | 元素类别：国家、地区和民族称谓 / 地理符号 | 仅提示人工复核，不自动判定违规、违法或冒犯；不作地图、边界或符号的政治含义判断",
+     "authorName": null,
+     "riskCategory": "language",
+     "riskCategoryLabel": "语言",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "incident_013",
+     "recordType": "incident",
+     "recordTypeLabel": "真实案例",
+     "title": "Yadea Vietnam（雅迪电动车越南公司）官网门店地图｜map",
+     "sourceTitle": "Using map that violates Vietnam's sovereignty was a mistake: Yadea Vietnam",
+     "sourceType": "media",
+     "sourceUrl": "https://e.vnexpress.vn/news/business/companies/using-map-that-violates-vietnam-s-sovereignty-was-a-mistake-yadea-vietnam-4748303.html",
+     "publishedAt": "页面未显示具体日期（正文述“周一”回应、截图标注 2024-05-19）",
+     "accessedAt": "2026-11-14T16:49:36+08:00",
+     "quoteOriginal": "We admit to making a severe mistake by partnering with service providers responsible for building the website and providing the map that caused the recent issue. We sincerely apologize for this mistake.",
+     "quoteLabel": "原文短引",
+     "translationZh": "我们承认犯下严重错误：与负责建站和提供地图的服务商合作，导致了近期的问题。我们为此真诚道歉。（雅迪越南声明）",
+     "claimLabel": "来源记载",
+     "claim": "雅迪越南发表声明，承认在网站建设服务商与地图供应商的合作上“犯下严重错误”，导致官网门店地图将越南黄沙（Hoàng Sa）、长沙（Trường Sa）群岛仅以中文“Xisha”“Nansha”标注；公司称已审查并移除网站上的不当地图图像，并表示在确认数据符合越南法律前不再开放该功能（VnExpress International、Tuoi Tre News 均逐字引用该声明）。",
+     "consequence": "公司公开道歉并移除官网地图图像；门店查询功能下线整改（两家独立媒体逐字引用公司声明并载明功能不可访问）。行政处罚：本次未找到，不记录。",
+     "analysis": {
+      "riskSignal": "第三方地图/建站供应商提供的底图，对争议地名的标注语言与他国一致；地名仅用中文、无当地语言版本；地图仅对境外 IP 可见（本地测试漏检）。",
+      "recommendedAction": "把“地图供应商”纳入合规审查清单，要求提供地名标注规范；用境外 IP 与本地 IP 双视角测试；对群岛/边界地名建立禁用词与替换表；合同中写入地图合规责任条款。"
+     },
+     "notes": "1) 两篇页面均未显示明确发布日期，事件日由“周六/周日”与截图标注推定；2) 公司声明的原始发布渠道（官网/新闻稿）未打开，依据两家媒体逐字引用；3) 是否被处罚、处罚金额未找到；4) 不含销量影响数据。",
+     "authorName": null,
+     "riskCategory": "geopolitical",
+     "riskCategoryLabel": "地缘政治",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
     },
     {
      "id": "incident_016",
@@ -191,6 +190,7 @@
      "publishedAt": "2023-04-14",
      "accessedAt": "2026-11-14T16:49:36+08:00",
      "quoteOriginal": "Ngày 14/4, Sở Thông tin và Truyền thông TP.HCM cho biết đã quyết định xử phạt Grab (Việt Nam) 60 triệu đồng.",
+     "quoteLabel": "原文短引",
      "translationZh": "4 月 14 日，胡志明市信息与传媒局表示已决定对 Grab（越南）罚款 6000 万越南盾。（该句为越通社中文版对应内容；越南语原文按同一事实回译，待人工核对原语种版本。）",
      "claimLabel": "来源记载",
      "claim": "2023-04-14 胡志明市信息与传媒局（Sở TT&TT TP.HCM）决定对 Grab 越南罚款 6000 万越南盾（越通社中文、SGGP English、The Investor 一致）。 违规起因：2023-04-08 有信息反映 Grab App 地图未完整显示黄沙、长沙群岛（越通社中文逐字）。 Grab 确认违法，称正与地图数据提供方 OpenStreetMap 合作核查更新（越通社中文、SGGP 一致）。 SGGP 载：至 2023-04-14，App 内相关岛礁名称已更正（SGGP 原文「As of April 14, the islands are correctly named on the Grab app」仅见 Vietnam News；SGGP 以图片说明「已更新」）。 主管部门同时要求 Grab 承诺落实防止再犯的措施、依法经营（越通社中文）。",
@@ -205,36 +205,10 @@
      "riskCategoryLabel": "地缘政治",
      "confidence": "high",
      "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
-    },
-    {
-     "id": "incident_031",
-     "recordType": "incident",
-     "recordTypeLabel": "真实案例",
-     "title": "CHAGEE（霸王茶姬）越南官方 App 与 Facebook 专页 'CHAGEE Vietnam'｜App 界面地图 / 平台内容 / 品牌舆情",
-     "sourceTitle": "Chinese milk tea brand Chagee faces boycott wave in Vietnam over illicit ‘nine-dash line’ map",
-     "sourceType": "media",
-     "sourceUrl": "https://news.tuoitre.vn/print/chinese-milk-tea-brand-chagee-faces-boycott-wave-in-vietnam-over-illicit-nine-dash-line-map-10385273.htm",
-     "publishedAt": "2025-03-16 14:10",
-     "accessedAt": "2026-11-14T16:49:36+08:00",
-     "quoteOriginal": "At present, the company's app is no longer available for download from app stores in Vietnam.",
-     "translationZh": "目前该公司 App 已无法从越南应用商店下载。",
-     "claimLabel": "来源记载",
-     "claim": "Tuoi Tre News 2025-03-16 报道：App 显示疑似含断续线的地图；App 在越南应用商店已不可下载；品牌越南官方 FB 专页出现大量愤怒评论；截至报道时 CHAGEE Vietnam 未作任何官方回应。 VietNamNet 越文版 2025-07-17 载：2025-03-07 该公司在 FB 专页发布指向 App 的链接；事发后品牌未作任何正式回应，但悄然移除争议地图与下载链接，并拆除在建门店招牌。 VietNamNet 英文版 2025-07-18 载：App 争议地图已移除、下载链接关闭；公司 2025-07-16 在胡志明市开出首店。",
-     "consequence": "App 在越南应用商店不可下载（媒体观察，非官方下架通知）；争议地图与下载链接被移除；在建招牌拆除。以上均由媒体报道，未见平台或品牌的下架通知原件。",
-     "analysis": {
-      "riskSignal": "App 启动页、登录页、地区选择器、门店地图、官网页脚等任何位置嵌入的全球或区域地图；含国家/地区下拉列表的界面。",
-      "recommendedAction": "对 App 全版本（iOS/Android/各地区包）逐屏截图核查地图；官网、FB 贴文链接、门店围挡与宣传物同步核查；建立第三方素材与 SDK 的地图来源清单。"
-     },
-     "notes": "不满足 A 门槛：未找到品牌、平台或监管机构的原始声明/公告/下架通知页面；App 下架状态仅为媒体观察，无法复核历史应用商店状态；FB 原帖与评论需登录，本次未核验； Tuoi Tre 与 VietNamNet 均为媒体转述。另：多篇中文自媒体称品牌『发布道歉声明、地图来自第三方、门店停业、扩张急刹车』，与上述来源明确矛盾，已列入 rejected。",
-     "authorName": null,
-     "riskCategory": "geopolitical",
-     "riskCategoryLabel": "地缘政治",
-     "confidence": "medium",
-     "lowConfidence": false,
-     "status": "verified",
-     "verification": "bulk_marked"
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
     },
     {
      "id": "incident_014",
@@ -247,6 +221,7 @@
      "publishedAt": "页面显示 2025-07（记者会 7-17；具体时刻未显示）",
      "accessedAt": "2026-11-14T16:49:36+08:00",
      "quoteOriginal": "ngày 7/3/2025, Công ty TNHH Chagee Việt Nam cung cấp thông tin đường dẫn đến ứng dụng Chagee hiển thị hình ảnh có đường chín đoạn (đường lưỡi bò), vi phạm chủ quyền quốc gia trên trang fanpage Facebook “CHAGEE Vietnam”",
+     "quoteLabel": "原文短引",
      "translationZh": "2025 年 3 月 7 日，Chagee 越南有限责任公司在其 Facebook 专页“CHAGEE Vietnam”上提供通往 Chagee 应用的链接，该应用显示含九段线（牛舌线）的图像，侵犯国家主权。",
      "claimLabel": "来源记载",
      "claim": "胡志明市文化体育厅监察机构对 Chagee Việt Nam 作出第 11/QĐ-XPHC 号行政处罚决定（2025-03-26），罚款 6,000 万越南盾，依据第 15/2020/NĐ-CP 号议定第 102 条第 7 款 b 点；违法事实为 2025-03-07 在 Facebook 专页“CHAGEE Vietnam”提供通往 CHAGEE App 的链接，该 App 显示含九段线（越南称“牛舌线”）的图像。该决定于 2025-07-17 市人委会例行记者会公布；公司已履行该处罚决定（Lao Động 英文版）。",
@@ -261,8 +236,41 @@
      "riskCategoryLabel": "地缘政治",
      "confidence": "medium",
      "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "incident_008",
+     "recordType": "incident",
+     "recordTypeLabel": "真实案例",
+     "title": "iME 娱乐集团（BlackPink 河内演唱会主办方）｜map",
+     "sourceTitle": "Organizer of BlackPink concert in Vietnam apologizes for using China’s illicit 9-dash line on website",
+     "sourceType": "media",
+     "sourceUrl": "https://news.tuoitre.vn/organizer-of-blackpink-concert-in-vietnam-apologizes-for-using-chinas-illicit-9-dash-line-on-website-10374262.htm",
+     "publishedAt": "页面未显示具体日期（正文述“周四”道歉，对应 2023-07-06）",
+     "accessedAt": "2026-11-14T16:49:36+08:00",
+     "quoteOriginal": "The map on the company's website does not represent any country’s territory",
+     "quoteLabel": "原文短引",
+     "translationZh": "公司网站上的地图不代表任何国家的领土。（iME 首席执行官 Brian Chow 声明）",
+     "claimLabel": "来源记载",
+     "claim": "iME 首席执行官 Brian Chow 就公司官网使用含九段线的地图公开道歉，称该地图“不代表任何国家的领土”，承诺迅速更换不适合越南民众的图像，并表示已直接与河内市文化体育局及越南相关机构沟通解释（Tuoi Tre News 逐字引用其声明）。越南文化体育旅游部 7-05 晚表示已下令对 iME 网站是否“宣传牛舌线”进行核查（中央社、RTI 引路透社）。",
+     "consequence": "iME 公开发表道歉声明并承诺更换地图图像（Tuoi Tre News 逐字引用）；越南主管部门启动核查程序（文化部 7-05 表态，中央社/RTI 报道）；演唱会是否被撤证：unknown，本次未找到撤证或停办的官方结论。",
+     "analysis": {
+      "riskSignal": "品牌/主办方的区域共用官网、活动页、票务页使用的地图含九段线；总部在第三国、面向多国运营的“共用站点”最容易漏检。",
+      "recommendedAction": "对所有面向越南用户的区域站点做地图清单（含页脚、门店定位、航线图、票务图）；不要复用其他国家的共用模板；发现后 24 小时内替换并准备书面说明。"
+     },
+     "notes": "1) 演唱会最终是否受影响（撤证/停办）无官方结论；2) 地图原图未取得（仅有路透社对缓存页的描述）；3) 品牌声明的原始发布渠道（新闻稿/Facebook）未打开，依据媒体逐字引用；4) 不含票务、损失数据。",
+     "authorName": null,
+     "riskCategory": "geopolitical",
+     "riskCategoryLabel": "地缘政治",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
     }
    ],
    "signals": [
@@ -310,33 +318,42 @@
     }
    ],
    "meta": {
+    "evidenceMode": "verified_only",
     "evidenceSource": "supabase",
     "snapshotDate": null,
     "fallbackReason": null,
-    "retrievedCount": 20,
+    "retrievedCount": 19,
+    "retrievedByTier": {
+     "verified": 19,
+     "candidate": 0
+    },
     "model": "deepseek-flash",
-    "promptVersion": "audit-v2",
-    "generatedAt": "2026-11-14T13:08:07.525Z",
-    "durationMs": 10430,
+    "promptVersion": "audit-v3",
+    "generatedAt": "2026-11-17T03:19:53.597Z",
+    "durationMs": 9906,
     "notices": [],
     "removed": {
      "invalidEvidenceIds": [],
      "droppedFindings": 0,
-     "sanitizedPhrases": 0
+     "sanitizedPhrases": 0,
+     "downgradedFindings": 0
     }
    }
   }
  },
  "skincare-ad": {
   "demoId": "skincare-ad",
-  "generatedAt": "2026-11-14T13:08:14.060Z",
+  "generatedAt": "2026-11-17T03:20:00.366Z",
   "contentType": "advertisement",
   "text": "越南首发！我们卖得最好的美白精华，坚持使用 7 天，肤色变化看得见。\n敏感肌也能放心用，老客回购率超过 90%。\nBest whitening serum — Mua ngay hôm nay!",
   "evidenceIds": [
+   "risk_014",
    "risk_008",
+   "incident_003",
    "rule_003",
+   "zhihu_079",
    "risk_010",
-   "risk_014"
+   "incident_010"
   ],
   "evidenceSource": "supabase",
   "model": "deepseek-flash",
@@ -350,64 +367,69 @@
    },
    "result": {
     "overall_level": "medium",
-    "summary": "文案含最高级用语、功效承诺与低越南语占比等多项风险信号，其中「最好」「best」与已核验的绝对化用语规则直接相关，需人工复核证明文件与本地化版式。",
+    "summary": "文案含最高级用语、功效时限承诺与高回购率数据，且越南语占比偏低，需人工复核合法证明文件、功效公布依据与语言版式；未发现地图、国家象征等政治敏感内容。",
     "findings": [
      {
       "id": "finding_001",
-      "location": "我们卖得最好的美白精华",
-      "location_match": "exact",
-      "risk_category": "language",
-      "severity": "medium",
-      "reason": "该规则文本规定，在未持有文体旅游部规定的合法证明文件的情况下，不得使用「best」「the best」「only」「number one」或含义相近词语；风险信号将「最好」列为同义最高级表述。是否构成问题取决于是否持有合法证明文件，属内容之外的事实。",
-      "evidence_ids": [
-       "risk_008"
-      ],
-      "recommendation": "删除或替换「卖得最好的」这一最高级表述，例如改为「热销美白精华」；如坚持保留，需先取得并留存文体旅游部规定的合法证明文件，再交人工复核。",
-      "requires_human_review": true,
-      "source": "model"
-     },
-     {
-      "id": "finding_002",
       "location": "Best whitening serum",
       "location_match": "exact",
       "risk_category": "language",
       "severity": "medium",
-      "reason": "该规则文本规定，无合法证明文件不得使用「best」等最高级词语；风险信号将「best」列为命中项。是否合规取决于是否持有合法证明文件这一外部事实。",
+      "reason": "该规则文本规定，同时含越南语与外语的广告，外文字号不得超过越南语文字的四分之三且须置于越南语下方；本句为纯英文表述，是否满足字号与位置要求需看实际版式，仅凭文本无法判断。",
       "evidence_ids": [
-       "risk_008"
+       "risk_014"
       ],
-      "recommendation": "删除英文「Best」，或改为不含最高级的描述性表述；如保留，需备妥合法证明文件并交人工复核。",
+      "recommendation": "补充越南语主文案，并确保外语字号不超过越南语的四分之三、置于越南语下方；提交最终版式图供人工复核。",
       "requires_human_review": true,
-      "source": "model"
+      "source": "model",
+      "evidence_basis": "verified"
+     },
+     {
+      "id": "finding_002",
+      "location": "我们卖得最好的美白精华",
+      "location_match": "exact",
+      "risk_category": "platform",
+      "severity": "medium",
+      "reason": "该规则文本规定，在未持有文体旅游部规定的合法证明文件时不得使用“best”“the best”等最高级用语；是否构成问题取决于是否持有相应证明文件，属内容之外的事实。",
+      "evidence_ids": [
+       "risk_008",
+       "incident_003"
+      ],
+      "recommendation": "删除或替换“卖得最好”等最高级表述，例如改为不含比较级的产品描述；如坚持保留，需准备并留存合法证明文件供人工复核。",
+      "requires_human_review": true,
+      "source": "model",
+      "evidence_basis": "verified"
      },
      {
       "id": "finding_003",
+      "location": "Best whitening serum",
+      "location_match": "exact",
+      "risk_category": "platform",
+      "severity": "medium",
+      "reason": "该规则文本将“best”列为需有合法证明文件方可使用的最高级用语；是否具备证明文件取决于外部事实。",
+      "evidence_ids": [
+       "risk_008"
+      ],
+      "recommendation": "将英文最高级表述改为中性描述，或准备对应证明文件后由人工复核确认。",
+      "requires_human_review": true,
+      "source": "model",
+      "evidence_basis": "verified"
+     },
+     {
+      "id": "finding_004",
       "location": "坚持使用 7 天，肤色变化看得见",
       "location_match": "exact",
       "risk_category": "product",
       "severity": "medium",
-      "reason": "该规则文本规定，化妆品广告内容须与产品性质、分类及依法公布的功效用途一致；风险信号将「美白」列为功效与效果承诺命中项。7 天见效的表述是否与已依法公布的功效一致，取决于产品公布档案等外部事实。",
+      "reason": "该规则文本规定化妆品广告内容须与产品性质、分类及依法公布的功效用途一致；7 天见效的时限性表述是否与已公布功效一致，取决于产品公布档案等外部事实。",
       "evidence_ids": [
        "rule_003",
-       "risk_010"
+       "zhihu_079"
       ],
-      "recommendation": "将「7 天」等时限性效果表述改为与已公布功效一致的描述，或删除具体天数；发布前核对产品公布档案中的功效用途表述，并交人工复核。",
+      "recommendation": "核对产品已公布的功效用途，删除或调整具体天数承诺；可改为不含时限的功效描述，并保留依据供人工复核。",
       "requires_human_review": true,
-      "source": "model"
-     },
-     {
-      "id": "finding_004",
-      "location": "敏感肌也能放心用",
-      "location_match": "exact",
-      "risk_category": "product",
-      "severity": "medium",
-      "reason": "该规则文本规定，化妆品广告不得使人误认该产品为药品，内容须与已依法公布的功效用途一致；「放心用」属安全性暗示，是否与公布档案一致取决于外部事实。",
-      "evidence_ids": [
-       "rule_003"
-      ],
-      "recommendation": "改为不含安全性保证的中性表述，例如「适合敏感肌使用」并核对是否与公布档案一致；如无依据，建议删除该句。",
-      "requires_human_review": true,
-      "source": "model"
+      "source": "model",
+      "evidence_basis": "verified"
      },
      {
       "id": "finding_005",
@@ -415,137 +437,57 @@
       "location_match": "exact",
       "risk_category": "product",
       "severity": "medium",
-      "reason": "该规则文本规定，对已注册或已公布商品与服务的数量、质量等作不实或引人混淆的广告属风险信号；回购率数据是否有来源、是否可核验，取决于内容之外的事实。",
+      "reason": "该规则文本规定，对已注册或已公布商品的质量、功能等作不实或引人混淆的广告属风险信号；回购率数据是否有来源支撑取决于外部事实。",
       "evidence_ids": [
-       "risk_010"
+       "risk_010",
+       "incident_010"
       ],
-      "recommendation": "补充可核验的数据来源与统计口径，或删除具体百分比；发布前交人工复核数据依据。",
+      "recommendation": "补充可核查的数据来源与统计口径，或删除该比例表述；提交来源材料供人工复核。",
       "requires_human_review": true,
-      "source": "model"
+      "source": "model",
+      "evidence_basis": "verified"
      },
      {
       "id": "finding_006",
-      "location": "Best whitening serum — Mua ngay hôm nay!",
+      "location": "敏感肌也能放心用",
       "location_match": "exact",
-      "risk_category": "platform",
-      "severity": "needs_review",
-      "reason": "该规则文本规定，同时含越南语与外语的广告，外文字号不得超过越南语文字的四分之三且须置于越南语文字下方。仅凭文本无法判断字号与版式，需查看实际素材。",
-      "evidence_ids": [
-       "risk_014"
-      ],
-      "recommendation": "核对最终物料中外文字号是否不超过越南语文字的四分之三、是否置于越南语下方；如不满足，调整版式后再发布。",
-      "requires_human_review": true,
-      "source": "model"
-     },
-     {
-      "id": "finding_007",
-      "location": "越南首发！",
-      "location_match": "exact",
-      "risk_category": "platform",
-      "severity": "low",
-      "reason": "该规则文本规定，化妆品广告须含化妆品名称、功效用途、公布该产品的组织或个人名称与地址等强制信息；本句为促销性表述，与强制信息缺失的相关性较弱，需结合完整物料判断。",
+      "risk_category": "product",
+      "severity": "medium",
+      "reason": "该规则文本规定化妆品广告不得使人误认产品为药品，内容须与依法公布的功效一致；“放心用”的适用性宣称是否与公布档案一致取决于外部事实。",
       "evidence_ids": [
        "rule_003"
       ],
-      "recommendation": "在完整广告物料中补齐化妆品名称、功效用途、公布主体名称与地址等强制信息，并交人工复核。",
+      "recommendation": "核对产品公布档案中的适用范围与警示信息，改为不含绝对保证意味的表述，并补充必要警示。",
       "requires_human_review": true,
-      "source": "model"
+      "source": "model",
+      "evidence_basis": "verified"
+     },
+     {
+      "id": "finding_007",
+      "location": "Mua ngay hôm nay!",
+      "location_match": "exact",
+      "risk_category": "language",
+      "severity": "low",
+      "reason": "该规则文本要求广告内容以越南语表达并列明例外；本句为越南语，但整体文案越南语占比偏低，需结合完整版式判断。",
+      "evidence_ids": [
+       "risk_014"
+      ],
+      "recommendation": "以越南语作为主文案语言，外语仅作辅助并符合字号与位置要求。",
+      "requires_human_review": true,
+      "source": "model",
+      "evidence_basis": "verified"
      }
     ],
     "missing_evidence": [
-     "文案中「美白」功效是否与产品在越南已依法公布的功效用途一致，现有证据无法确认。",
-     "「老客回购率超过 90%」是否有可核验的数据来源，现有证据无法确认。",
-     "是否持有文体旅游部规定的合法证明文件以支持「最好」「best」等最高级用语，现有证据无法确认。",
-     "广告实际版式中外文字号与位置是否符合越南语优先要求，需查看图片或视频素材。",
-     "产品是否已取得越南药品管理局（DAV）注册证书，现有证据仅有知乎作者提及，无法确认。"
+     "无法确认是否持有文体旅游部规定的最高级用语合法证明文件",
+     "无法确认“7 天肤色变化”“回购率超过 90%”“敏感肌放心用”是否与已依法公布的功效用途及可提交的检测/统计材料一致",
+     "无法确认最终版式中越南语与外语的字号比例及排列位置",
+     "无法确认广告是否已包含化妆品名称、功效用途、公布主体名称地址及国际协定规定的警示等强制信息",
+     "未找到第342/2025/NĐ-CP号议定对应的具体罚则文本"
     ],
     "disclaimer": "结果仅作发布前风险提示，不构成法律意见"
    },
    "evidence": [
-    {
-     "id": "risk_008",
-     "recordType": "risk_rule",
-     "recordTypeLabel": "风险信号",
-     "title": "广告中的绝对化、最高级用语",
-     "sourceTitle": "Law No. 16/2012/QH13 of June 21, 2012, on Advertising",
-     "sourceType": "official",
-     "sourceUrl": "https://www.wipo.int/wipolex/en/text/445955",
-     "publishedAt": "2012-06-21",
-     "accessedAt": "2026-11-14",
-     "quoteOriginal": "Advertising using the words “best”, “the best”, “only”, “number one” or words with similar meaning without legitimate documents proving so as prescribed by the Ministry of Culture, Sports and Tourism.",
-     "translationZh": "在未持有文体旅游部规定的合法证明文件的情况下，使用「best」「the best」「only」「number one」或含义相近词语的广告。",
-     "claimLabel": "依据",
-     "claim": "《广告法》第8条第11款逐字列举上述词语，规定在无文体旅游部规定的合法证明文件情况下不得使用；第38/2021/ND-CP号法令第34条第2款(a)项对无合法佐证的最高级用语广告设定 1,000 万至 2,000 万越南盾罚款。",
-     "consequence": null,
-     "analysis": {
-      "riskSignal": null,
-      "recommendedAction": "是否属于商业广告？是否持有可提交的合法佐证文件？可否改为可验证的具体参数表述？"
-     },
-     "notes": "误报风险与限制：法条限定为「无合法证明文件」的广告用语；持有证明文件的情形、非广告语境（如产品参数、用户评论、内部文档）不构成自动命中。中文「最」「第一」「唯一」与英文列举词的对应关系属分析推断，需人工确认。 | 适用语境：商品标题; 卖点文案; 直播间口播; Banner; 详情页; 短视频字幕 | 来源性质：国际组织官方法律数据库（WIPO Lex）收录的越南法律英译本 | 元素类别：广告承诺 | 仅提示人工复核，不自动判定违规、违法或冒犯；不作地图、边界或符号的政治含义判断",
-     "authorName": null,
-     "riskCategory": "language",
-     "riskCategoryLabel": "语言",
-     "confidence": "high",
-     "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
-    },
-    {
-     "id": "rule_003",
-     "recordType": "official_rule",
-     "recordTypeLabel": "官方规则",
-     "title": "第342/2025/NĐ-CP号政府议定：《〈广告法〉若干条款实施细则》",
-     "sourceTitle": "Nghị định số 342/2025/NĐ-CP Quy định chi tiết một số điều của Luật Quảng cáo",
-     "sourceType": "official",
-     "sourceUrl": "https://vanban.chinhphu.vn/?pageid=27160&docid=216403",
-     "publishedAt": "2025-12-26",
-     "accessedAt": "2026-11-14T15:44:41+08:00",
-     "quoteOriginal": "1. Nội dung quảng cáo mỹ phẩm phải có các thông tin bắt buộc sau: Tên mỹ phẩm; tính năng, công dụng của mỹ phẩm; tên, địa chỉ của tổ chức, cá nhân công bố sản phẩm mỹ phẩm; các cảnh báo theo quy định của các hiệp định quốc tế. Trường hợp tên mỹ phẩm đã bao gồm các thông tin về tính năng, công dụng thì không phải thể hiện nội dung này trong sản phẩm quảng cáo.\n2. Quảng cáo mỹ phẩm không được gây hiểu nhầm sản phẩm đó là thuốc. Nội dung quảng cáo mỹ phẩm phải phù hợp với bản chất sản phẩm mỹ phẩm, phân loại sản phẩm và tính năng, công dụng đã được công bố theo quy định của pháp luật.\n3. Quảng cáo mỹ phẩm trên báo nói, báo hình phải đọc rõ ràng nội dung tên, tính năng, công dụng của mỹ phẩm, các cảnh báo theo quy định của các hiệp định quốc tế. Quảng cáo trên báo hình có thời lượng dưới 30 giây thì không phải đọc cảnh báo nhưng phải thể hiện bằng chữ và bảo đảm cung cấp thông tin đầy đủ đến người tiếp nhận.\n4. Khi quảng cáo mỹ phẩm không sử dụng hình ảnh, trang phục, tên, thư tín, bài viết của các đơn vị, cơ sở y tế, bác sĩ, dược sĩ, nhân viên y tế khác.",
-     "translationZh": "1. 化妆品广告内容须含以下强制信息：化妆品名称；化妆品性能、功效；公布该化妆品产品的组织、个人名称与地址；依国际协定规定的警示。若化妆品名称已包含性能、功效信息，则广告中无需再体现该项。2. 化妆品广告不得使人误认该产品为药品。广告内容须与化妆品产品性质、产品分类及依法公布的性能、功效相符。3. 广播、电视化妆品广告须清晰读出名称、性能、功效及国际协定规定的警示；时长不足30秒的电视广告可不读出警示，但须以文字体现并保证向接收者提供完整信息。4. 化妆品广告不得使用医疗单位、医疗机构、医生、药师及其他医务人员的图像、服装、姓名、书信、文章。",
-     "claimLabel": "该规则文本规定",
-     "claim": "广告须含化妆品名称、功效与用途、产品公布组织/个人名称地址、国际协定规定的警示；不得使消费者误认该化妆品为药品；内容须与产品性质、分类及已依法公布的功效用途一致；广播/电视广告须清晰读出名称、功效用途与警示（30秒以下电视广告可不读警示但须以文字呈现）；不得使用医疗单位、医疗机构、医生、药师及其他医务人员的图像、服装、姓名、书信、文章。",
-     "consequence": "本条未列罚则；处罚依据需另查，本次列为证据缺口。",
-     "analysis": {
-      "riskSignal": "化妆品文案出现治疗、疗效类表述或暗示产品为药品；出现医生、药师、医疗机构形象或白大褂、诊室场景；缺少名称/功效用途/公布主体名称地址/国际协定警示",
-      "recommendedAction": "逐条比对广告素材是否含四项强制信息；删除医疗化宣称与医务人员形象；核对功效表述与已依法公布内容一致"
-     },
-     "notes": "rule_type=政府议定（Nghị định）；适用主体=化妆品广告的制作、发布方；适用产品=化妆品；生效日期=2026-02-15；需人工复核=是（G-01、G-02；引文为节录且未标省略号，需按官方 PDF 标注省略）；本条未列罚则，处罚依据仍在证据缺口内；risk_category/risk_signal/recommended_action 为分析字段，非来源事实",
-     "authorName": "Chính phủ（越南政府）；Bộ Văn hóa, Thể thao và Du lịch（文化体育与旅游部）",
-     "riskCategory": "language",
-     "riskCategoryLabel": "语言",
-     "confidence": "high",
-     "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
-    },
-    {
-     "id": "risk_010",
-     "recordType": "risk_rule",
-     "recordTypeLabel": "风险信号",
-     "title": "虚假或引人误解的商业宣传",
-     "sourceTitle": "Law No. 16/2012/QH13 of June 21, 2012, on Advertising",
-     "sourceType": "official",
-     "sourceUrl": "https://www.wipo.int/wipolex/en/text/445955",
-     "publishedAt": "2012-06-21",
-     "accessedAt": "2026-11-14",
-     "quoteOriginal": "Advertising incorrectly or causing confusion about the business competence, the ability to provide products, goods and services of organizations and individuals trading and providing such products, goods and services; about the quantity, quality, prices, features, designs, package, brand name, kinds, method of service, warranty duration of the registered or announced products, goods and services.",
-     "translationZh": "对经营者的经营能力、提供商品与服务的能力，以及对已注册或已公布商品与服务的数量、质量、价格、功能、设计、包装、品牌、种类、服务方式、保修期作不实或引人混淆的广告。",
-     "claimLabel": "依据",
-     "claim": "《广告法》第8条第9款逐字列举上述项目；第38/2021号法令第34条第5款对虚假或误导广告设定 6,000 万至 8,000 万越南盾罚款并附更正信息等措施。",
-     "consequence": null,
-     "analysis": {
-      "riskSignal": null,
-      "recommendedAction": "主张是否有可提交的凭证？数据来源、统计口径与时间戳是否明确？"
-     },
-     "notes": "误报风险与限制：法条要求「不实」或「引起混淆」的要件；真实可验证的参数陈述不落入。系统不应仅凭出现数字、价格或产地词就自动拦截。 | 适用语境：商品详情页; 直播口播; 功效描述; 产地标注; 售后承诺 | 来源性质：国际组织官方法律数据库（WIPO Lex）收录的越南法律英译本 | 元素类别：广告承诺 | 仅提示人工复核，不自动判定违规、违法或冒犯；不作地图、边界或符号的政治含义判断",
-     "authorName": null,
-     "riskCategory": "product",
-     "riskCategoryLabel": "产品表达",
-     "confidence": "high",
-     "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
-    },
     {
      "id": "risk_014",
      "recordType": "risk_rule",
@@ -557,6 +499,7 @@
      "publishedAt": "2012-06-21",
      "accessedAt": "2026-11-14",
      "quoteOriginal": "For advertisements that contain both Vietnamese and the foreign language, the foreign font size must not exceed three quarters of the Vietnamese text and must be placed below the Vietnamese text; on radio, TV or other audio-visual media, the Vietnamese must be spoken before the foreign text",
+     "quoteLabel": "原文短引",
      "translationZh": "同时含越南语与外语的广告，外文字号不得超过越南语文字的四分之三，且须置于越南语文字下方；在广播、电视或其他视听媒体上，须先播越南语，后播外语。",
      "claimLabel": "依据",
      "claim": "《广告法》第18条第1款要求广告内容以越南语表达并列出例外；第2款规定双语广告的外文字号不得超过越南语文字的 3/4、须置于越南语下方，视听媒体须先播越南语。第38/2021号法令第35条第1款对违反语言文字规定设定罚款。",
@@ -571,8 +514,196 @@
      "riskCategoryLabel": "语言",
      "confidence": "high",
      "lowConfidence": false,
-     "status": "verified",
-     "verification": "individual"
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "risk_008",
+     "recordType": "risk_rule",
+     "recordTypeLabel": "风险信号",
+     "title": "广告中的绝对化、最高级用语",
+     "sourceTitle": "Law No. 16/2012/QH13 of June 21, 2012, on Advertising",
+     "sourceType": "official",
+     "sourceUrl": "https://www.wipo.int/wipolex/en/text/445955",
+     "publishedAt": "2012-06-21",
+     "accessedAt": "2026-11-14",
+     "quoteOriginal": "Advertising using the words “best”, “the best”, “only”, “number one” or words with similar meaning without legitimate documents proving so as prescribed by the Ministry of Culture, Sports and Tourism.",
+     "quoteLabel": "原文短引",
+     "translationZh": "在未持有文体旅游部规定的合法证明文件的情况下，使用「best」「the best」「only」「number one」或含义相近词语的广告。",
+     "claimLabel": "依据",
+     "claim": "《广告法》第8条第11款逐字列举上述词语，规定在无文体旅游部规定的合法证明文件情况下不得使用；第38/2021/ND-CP号法令第34条第2款(a)项对无合法佐证的最高级用语广告设定 1,000 万至 2,000 万越南盾罚款。",
+     "consequence": null,
+     "analysis": {
+      "riskSignal": null,
+      "recommendedAction": "是否属于商业广告？是否持有可提交的合法佐证文件？可否改为可验证的具体参数表述？"
+     },
+     "notes": "误报风险与限制：法条限定为「无合法证明文件」的广告用语；持有证明文件的情形、非广告语境（如产品参数、用户评论、内部文档）不构成自动命中。中文「最」「第一」「唯一」与英文列举词的对应关系属分析推断，需人工确认。 | 适用语境：商品标题; 卖点文案; 直播间口播; Banner; 详情页; 短视频字幕 | 来源性质：国际组织官方法律数据库（WIPO Lex）收录的越南法律英译本 | 元素类别：广告承诺 | 仅提示人工复核，不自动判定违规、违法或冒犯；不作地图、边界或符号的政治含义判断",
+     "authorName": null,
+     "riskCategory": "language",
+     "riskCategoryLabel": "语言",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "incident_003",
+     "recordType": "incident",
+     "recordTypeLabel": "真实案例",
+     "title": "Sữa lúa mạch Nestlé Milo（Nestlé Milo 麦芽乳饮品）/ Công ty TNHH Nestlé Việt Nam｜产品包装标签与大众媒体广告中的信息、最高级宣传用语",
+     "sourceTitle": "Xử phạt vi phạm hành chính Công ty Nestlé Việt Nam, buộc tháo gỡ quảng cáo",
+     "sourceType": "media",
+     "sourceUrl": "https://www.vietnamplus.vn/xu-phat-vi-pham-hanh-chinh-cong-ty-nestle-viet-nam-buoc-thao-go-quang-cao-post1044294.vnp",
+     "publishedAt": "2025-06-14 08:34（署名 Sỹ Tuyên，越通社 VietnamPlus）",
+     "accessedAt": "2026-11-14T16:49:36+08:00",
+     "quoteOriginal": "Tổng số tiền Công ty Trách nhiệm hữu hạn Nestlé Việt Nam bị xử phạt đối với hai hành vi vi phạm hành chính trên là 80 triệu đồng; không áp dụng hình thức xử phạt bổ sung.",
+     "quoteLabel": "原文短引",
+     "translationZh": null,
+     "claimLabel": "来源记载",
+     "claim": "同奈省公安于 2025-06-14 通报，已对 Nestlé Việt Nam 作出行政处罚（越通社、VietNamNet）。 两项行为分别被罚 50 triệu đồng 与 30 triệu đồng，合计 80 triệu đồng（越通社逐项列明）。 第二项行为的补救措施为：强制撤除/拆除/删除广告或召回刊载该广告的报纸杂志印刷品，自收到决定起 10 日内执行（越通社逐字）。 2025-06-13 同奈省公安决定不予刑事立案，理由为未构成'欺骗客户罪'要件（越通社）。 VietNamNet 另载：同奈省卫生厅成立跨部门检查组、抽样送检，2025-05-28 检验结果显示产品安全与质量指标符合自我公布档案（VietNamNet 独立采写内容）。 Lao Dong 2025-06-14 载明两项行为的具体法条依据（第 98/2020/NĐ-CP 号议定第 47 条第 2 款 a 点；第 38/2021/NĐ-CP 号议定第 34 条第 2 款 a 点），并称处罚决定由同奈省公安厅厅长于 2025-06-13 签发。 雀巢越南代表在越南政府门户 2025-06-14 稿中回应：公司已主动暂停该产品的宣传活动、主动致函主管机关请求指导，并承诺按相关指引与规定落实整改（政府门户越南语原文）。",
+     "consequence": "行政处罚 80 triệu đồng 及『责令 10 日内撤除/删除违规广告或召回刊载广告的印刷品』已由两个独立来源一致载明。注意：来源写的是责令（buộc），本次未找到执行完成的确认，故不得写成『已撤下』。",
+     "analysis": {
+      "riskSignal": "广告或包装上出现'最/唯一/第一/最好'等等同最高级表述；或产品标签信息与可提交的合法证明材料不对应。",
+      "recommendedAction": "建立宣称—证据一一对应表，逐条核对最高级用语的合法证明文件；包装标签、广告、商品页文案统一校验；核对当地消费者权益保护法与广告法行政处罚条款。"
+     },
+     "notes": "1) 行政处罚决定书原件未找到公开可访问页面，A 依据国家通讯社对决定的逐项引述；2) 来源使用『责令』（buộc），执行结果未确认，不得改写为已完成下架；3) 品牌回应为政府门户所载公司代表表态，非公开道歉声明，也未载明对违规认定的立场；4) 三家媒体事实同源（同一处罚决定）；5) 日期差异：越通社称 6/14 公安『通报』，Lao Dong 称决定 6/13 由公安厅厅长签发，两者可并存但本次未核决定书原件；6) 不含销量、损失金额或消费者反应规模的表述。【置信度分层】对处罚决定与责令内容）；unknown（对执行完成与品牌回应。【CSV】translation_zh 留空：输入标记 pending_human_translation_keep_original。",
+     "authorName": null,
+     "riskCategory": "product",
+     "riskCategoryLabel": "产品表达",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "rule_003",
+     "recordType": "official_rule",
+     "recordTypeLabel": "官方规则",
+     "title": "第342/2025/NĐ-CP号政府议定：《〈广告法〉若干条款实施细则》",
+     "sourceTitle": "Nghị định số 342/2025/NĐ-CP Quy định chi tiết một số điều của Luật Quảng cáo",
+     "sourceType": "official",
+     "sourceUrl": "https://vanban.chinhphu.vn/?pageid=27160&docid=216403",
+     "publishedAt": "2025-12-26",
+     "accessedAt": "2026-11-14T15:44:41+08:00",
+     "quoteOriginal": "1. Nội dung quảng cáo mỹ phẩm phải có các thông tin bắt buộc sau: Tên mỹ phẩm; tính năng, công dụng của mỹ phẩm; tên, địa chỉ của tổ chức, cá nhân công bố sản phẩm mỹ phẩm; các cảnh báo theo quy định của các hiệp định quốc tế. Trường hợp tên mỹ phẩm đã bao gồm các thông tin về tính năng, công dụng thì không phải thể hiện nội dung này trong sản phẩm quảng cáo.\n2. Quảng cáo mỹ phẩm không được gây hiểu nhầm sản phẩm đó là thuốc. Nội dung quảng cáo mỹ phẩm phải phù hợp với bản chất sản phẩm mỹ phẩm, phân loại sản phẩm và tính năng, công dụng đã được công bố theo quy định của pháp luật.\n3. Quảng cáo mỹ phẩm trên báo nói, báo hình phải đọc rõ ràng nội dung tên, tính năng, công dụng của mỹ phẩm, các cảnh báo theo quy định của các hiệp định quốc tế. Quảng cáo trên báo hình có thời lượng dưới 30 giây thì không phải đọc cảnh báo nhưng phải thể hiện bằng chữ và bảo đảm cung cấp thông tin đầy đủ đến người tiếp nhận.\n4. Khi quảng cáo mỹ phẩm không sử dụng hình ảnh, trang phục, tên, thư tín, bài viết của các đơn vị, cơ sở y tế, bác sĩ, dược sĩ, nhân viên y tế khác.",
+     "quoteLabel": "原文短引",
+     "translationZh": "1. 化妆品广告内容须含以下强制信息：化妆品名称；化妆品性能、功效；公布该化妆品产品的组织、个人名称与地址；依国际协定规定的警示。若化妆品名称已包含性能、功效信息，则广告中无需再体现该项。2. 化妆品广告不得使人误认该产品为药品。广告内容须与化妆品产品性质、产品分类及依法公布的性能、功效相符。3. 广播、电视化妆品广告须清晰读出名称、性能、功效及国际协定规定的警示；时长不足30秒的电视广告可不读出警示，但须以文字体现并保证向接收者提供完整信息。4. 化妆品广告不得使用医疗单位、医疗机构、医生、药师及其他医务人员的图像、服装、姓名、书信、文章。",
+     "claimLabel": "该规则文本规定",
+     "claim": "广告须含化妆品名称、功效与用途、产品公布组织/个人名称地址、国际协定规定的警示；不得使消费者误认该化妆品为药品；内容须与产品性质、分类及已依法公布的功效用途一致；广播/电视广告须清晰读出名称、功效用途与警示（30秒以下电视广告可不读警示但须以文字呈现）；不得使用医疗单位、医疗机构、医生、药师及其他医务人员的图像、服装、姓名、书信、文章。",
+     "consequence": "本条未列罚则；处罚依据需另查，本次列为证据缺口。",
+     "analysis": {
+      "riskSignal": "化妆品文案出现治疗、疗效类表述或暗示产品为药品；出现医生、药师、医疗机构形象或白大褂、诊室场景；缺少名称/功效用途/公布主体名称地址/国际协定警示",
+      "recommendedAction": "逐条比对广告素材是否含四项强制信息；删除医疗化宣称与医务人员形象；核对功效表述与已依法公布内容一致"
+     },
+     "notes": "rule_type=政府议定（Nghị định）；适用主体=化妆品广告的制作、发布方；适用产品=化妆品；生效日期=2026-02-15；需人工复核=是（G-01、G-02；引文为节录且未标省略号，需按官方 PDF 标注省略）；本条未列罚则，处罚依据仍在证据缺口内；risk_category/risk_signal/recommended_action 为分析字段，非来源事实",
+     "authorName": "Chính phủ（越南政府）；Bộ Văn hóa, Thể thao và Du lịch（文化体育与旅游部）",
+     "riskCategory": "language",
+     "riskCategoryLabel": "语言",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "zhihu_079",
+     "recordType": "zhihu",
+     "recordTypeLabel": "知乎内容",
+     "title": "越南市场必读:化妆品合规全解析",
+     "sourceTitle": "越南市场必读:化妆品合规全解析",
+     "sourceType": "zhihu",
+     "sourceUrl": "https://zhuanlan.zhihu.com/p/1929124274817446523?utm_medium=openapi_platform&utm_source=b38f6831b176",
+     "publishedAt": "2025-07-17T10:25:56+08:00",
+     "accessedAt": "2026-11-14",
+     "quoteOriginal": "所有化妆品想要进入越南市场，都需要受到越南公共卫生部辖下的越南卫生部药品管理局(Drug Administration of Vietnam, DAV)监管，获得DAV颁发的注册证书。",
+     "quoteLabel": "原文短引",
+     "translationZh": null,
+     "claimLabel": "知乎作者称",
+     "claim": "化妆品进入越南市场须获越南卫生部药品管理局(DAV)注册证书，有效期五年",
+     "consequence": null,
+     "analysis": {
+      "riskSignal": "产品注册与功效宣称合规缺失将导致上架受阻",
+      "recommendedAction": null
+     },
+     "notes": "query=越南 美妆; result_rank=8; likes=0; comments=0; authority=3; full_text_available=true; 已打开原页核对（渲染服务），标题与正文一致",
+     "authorName": "海多客SeaDocker",
+     "riskCategory": "product",
+     "riskCategoryLabel": "产品表达",
+     "confidence": "medium",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "risk_010",
+     "recordType": "risk_rule",
+     "recordTypeLabel": "风险信号",
+     "title": "虚假或引人误解的商业宣传",
+     "sourceTitle": "Law No. 16/2012/QH13 of June 21, 2012, on Advertising",
+     "sourceType": "official",
+     "sourceUrl": "https://www.wipo.int/wipolex/en/text/445955",
+     "publishedAt": "2012-06-21",
+     "accessedAt": "2026-11-14",
+     "quoteOriginal": "Advertising incorrectly or causing confusion about the business competence, the ability to provide products, goods and services of organizations and individuals trading and providing such products, goods and services; about the quantity, quality, prices, features, designs, package, brand name, kinds, method of service, warranty duration of the registered or announced products, goods and services.",
+     "quoteLabel": "原文短引",
+     "translationZh": "对经营者的经营能力、提供商品与服务的能力，以及对已注册或已公布商品与服务的数量、质量、价格、功能、设计、包装、品牌、种类、服务方式、保修期作不实或引人混淆的广告。",
+     "claimLabel": "依据",
+     "claim": "《广告法》第8条第9款逐字列举上述项目；第38/2021号法令第34条第5款对虚假或误导广告设定 6,000 万至 8,000 万越南盾罚款并附更正信息等措施。",
+     "consequence": null,
+     "analysis": {
+      "riskSignal": null,
+      "recommendedAction": "主张是否有可提交的凭证？数据来源、统计口径与时间戳是否明确？"
+     },
+     "notes": "误报风险与限制：法条要求「不实」或「引起混淆」的要件；真实可验证的参数陈述不落入。系统不应仅凭出现数字、价格或产地词就自动拦截。 | 适用语境：商品详情页; 直播口播; 功效描述; 产地标注; 售后承诺 | 来源性质：国际组织官方法律数据库（WIPO Lex）收录的越南法律英译本 | 元素类别：广告承诺 | 仅提示人工复核，不自动判定违规、违法或冒犯；不作地图、边界或符号的政治含义判断",
+     "authorName": null,
+     "riskCategory": "product",
+     "riskCategoryLabel": "产品表达",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
+    },
+    {
+     "id": "incident_010",
+     "recordType": "incident",
+     "recordTypeLabel": "真实案例",
+     "title": "Kẹo rau củ Kera（Kera 蔬果糖 / Supergreens Gummies）；Chị Em Rọt 集团（CER Group）｜livestream",
+     "sourceTitle": "Quang Linh Vlogs and Hang Du Muc were fined 140 million VND for false advertising.",
+     "sourceType": "media",
+     "sourceUrl": "https://baonghean.vn/en/quang-linh-vlogs-hang-du-muc-bi-phat-140-trieu-do-quang-cao-sai-su-that-10293528.html",
+     "publishedAt": "2025-03-21 16:21（页面显示，署名 Thu Hang）",
+     "accessedAt": "2026-11-14T16:49:36+08:00",
+     "quoteOriginal": "một viên kẹo tương đương một đĩa rau luộc（一颗糖等于一盘水煮菜）",
+     "quoteLabel": "原文短引",
+     "translationZh": "一颗糖等于一盘水煮菜。（直播广告语）",
+     "claimLabel": "来源记载",
+     "claim": "越南文化体育旅游部广播电视与电子信息局对 Nguyễn Thị Thái Hằng（Hằng Du Mục）与 Phạm Quang Linh（Quang Linh Vlogs）各罚 7,000 万越南盾、合计 1.4 亿盾，依据第 38/2021/NĐ-CP 号议定第 34 条第 5 款（经第 129/2021/NĐ-CP 号修订），理由为对 Kera 蔬果糖质量作不准确、误导性广告，并强制更正信息；局长 Lê Quang Tú Do 于 2025-03-21 公布（baonghean、SGGP 英文版）。",
+     "consequence": "行政处罚：两名直播主各 7,000 万盾、合计 1.4 亿盾，并强制更正信息（主管机关公布）；刑事：2025-11-19 一审对 5 名被告判处 2 年至 3 年 3 个月有期徒刑（Tuoi Tre News 庭审报道）。产品退款：公司称对 2024-12-12 至 2025-03-14 期间购买者退款（Vietnam News）。",
+     "analysis": {
+      "riskSignal": "直播/短视频中出现“等同于某类食物”“替代正餐”“最高级/唯一/第一”等功效等同或绝对化表述；宣称与可提交的检测报告、自我公布档案不一致。",
+      "recommendedAction": "建立“宣称—检测报告—自我公布档案”三方对照；对“等价/替代/疗效”类表述一律要求第三方检测支撑；直播脚本纳入事前审核并留痕；准备更正与退款方案。"
+     },
+     "notes": "1) 处罚决定书原件未公开，A/B 均为媒体对局长公布的引述；2) 决定日存在 3-20 与 3-21 两种表述，未核原件；3) 纤维含量 0.51g/盒 vs 0.03g/颗 两个口径分别来自不同报道；4) 本库只记录处罚与判决，不评价案件定性之外的商业影响。",
+     "authorName": null,
+     "riskCategory": "product",
+     "riskCategoryLabel": "产品表达",
+     "confidence": "high",
+     "lowConfidence": false,
+     "tier": "verified",
+     "tierLabel": "已核验来源",
+     "dbStatus": "verified",
+     "bulkMarked": false
     }
    ],
    "signals": [
@@ -620,26 +751,32 @@
     }
    ],
    "meta": {
+    "evidenceMode": "verified_only",
     "evidenceSource": "supabase",
     "snapshotDate": null,
     "fallbackReason": null,
-    "retrievedCount": 19,
+    "retrievedCount": 18,
+    "retrievedByTier": {
+     "verified": 18,
+     "candidate": 0
+    },
     "model": "deepseek-flash",
-    "promptVersion": "audit-v2",
-    "generatedAt": "2026-11-14T13:08:14.060Z",
-    "durationMs": 6521,
+    "promptVersion": "audit-v3",
+    "generatedAt": "2026-11-17T03:20:00.366Z",
+    "durationMs": 6731,
     "notices": [],
     "removed": {
      "invalidEvidenceIds": [],
      "droppedFindings": 0,
-     "sanitizedPhrases": 0
+     "sanitizedPhrases": 0,
+     "downgradedFindings": 0
     }
    }
   }
  },
  "cs-shipping-reply": {
   "demoId": "cs-shipping-reply",
-  "generatedAt": "2026-11-14T13:08:14.075Z",
+  "generatedAt": "2026-11-17T03:20:00.390Z",
   "contentType": "customer_service",
   "text": "您好，您的订单已于今天发出，预计 3–5 个工作日送达。\n如果收到的商品有破损，请在签收后 48 小时内拍照联系我们，我们会为您补发或退款。\n感谢您的耐心等待！",
   "evidenceIds": [],
@@ -674,19 +811,25 @@
     }
    ],
    "meta": {
+    "evidenceMode": "verified_only",
     "evidenceSource": "supabase",
     "snapshotDate": null,
     "fallbackReason": null,
     "retrievedCount": 0,
+    "retrievedByTier": {
+     "verified": 0,
+     "candidate": 0
+    },
     "model": null,
-    "promptVersion": "audit-v2",
-    "generatedAt": "2026-11-14T13:08:14.075Z",
+    "promptVersion": "audit-v3",
+    "generatedAt": "2026-11-17T03:20:00.390Z",
     "durationMs": 2,
     "notices": [],
     "removed": {
      "invalidEvidenceIds": [],
      "droppedFindings": 0,
-     "sanitizedPhrases": 0
+     "sanitizedPhrases": 0,
+     "downgradedFindings": 0
     }
    }
   }

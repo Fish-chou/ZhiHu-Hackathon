@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import { AuditWorkspace } from "@/components/audit/audit-workspace";
+import { getEvidenceMode } from "@/lib/evidence-mode";
 
 export default function Home() {
+  const demo = getEvidenceMode() === "demo";
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-5 py-10 sm:px-8 sm:py-12">
       <div className="flex max-w-3xl flex-col gap-3">
@@ -9,7 +11,9 @@ export default function Home() {
           在发布前，提前发现内容进入越南市场时可能产生的风险。
         </h1>
         <p className="text-base leading-7 text-muted">
-          粘贴准备发布的广告文案、商品详情页或客服话术。系统只依据已核验的公开证据指出可能的问题，每一处都附来源和修改建议。
+          {demo
+            ? "粘贴准备发布的广告文案、商品详情页或客服话术。系统依据公开证据指出可能的问题：已核验来源和候选资料（待核验）分开标注，只有候选资料支持的判断一律列为待人工复核。"
+            : "粘贴准备发布的广告文案、商品详情页或客服话术。系统只依据已核验的公开证据指出可能的问题，每一处都附来源和修改建议。"}
         </p>
       </div>
       <Suspense fallback={<div className="h-80 rounded-lg border border-rule bg-sheet" aria-hidden />}>

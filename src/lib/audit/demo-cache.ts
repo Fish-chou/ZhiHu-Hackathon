@@ -1,5 +1,6 @@
 import demoCasesJson from "@/data/demo/demo-cases.json";
 import demoResultsJson from "@/data/demo/demo-results.json";
+import type { EvidenceMode } from "@/lib/evidence-mode";
 import type { AuditResponse, ContentType, Level } from "./types";
 
 export interface DemoCase {
@@ -25,7 +26,7 @@ export interface CachedDemoEntry {
 }
 
 export const DEMO_CASES = demoCasesJson as DemoCase[];
-const DEMO_RESULTS = demoResultsJson as Record<string, CachedDemoEntry>;
+const DEMO_RESULTS = demoResultsJson as unknown as Record<string, CachedDemoEntry>;
 
 const norm = (s: string) => s.replace(/\r\n?/g, "\n").trim();
 
@@ -43,19 +44,22 @@ export function findDemoCache(contentType: ContentType, text: string, demoId?: s
 }
 
 /**
- * Serves a cached result, clearly labelled. When a set of currently verified ids is given,
- * citations that are no longer verified are removed, and findings left without evidence are dropped.
+ * Serves a cached result, clearly labelled. Citations outside allowedIds are removed; under verified_only
+ * (the current mode, or the mode the entry was generated in) candidate cards are removed too, and cards
+ * without a tier are treated as candidates. Findings left without evidence are dropped.
  */
-export function toCachedResponse(entry: CachedDemoEntry, reason: string, verifiedIds?: Set<string>): AuditResponse {
+export function toCachedResponse(entry: CachedDemoEntry, reason: string, allowedIds?: Set<string>, mode?: EvidenceMode): AuditResponse {
   const r = structuredClone(entry.response);
-  if (verifiedIds) {
-    r.result.findings = r.result.findings
-      .map((f) => ({ ...f, evidence_ids: f.evidence_ids.filter((id) => verifiedIds.has(id)) }))
-      .filter((f) => f.evidence_ids.length > 0);
-    const cited = new Set(r.result.findings.flatMap((f) => f.evidence_ids));
-    r.evidence = r.evidence.filter((c) => cited.has(c.id));
-  }
+  const effectiveMode: EvidenceMode = mode ?? r.meta.evidenceMode ?? "verified_only";
+  const verifiedCards = new Set(r.evidence.filter((c) => c.tier === "verified").map((c) => c.id));
+  const keep = (id: string) => (!allowedIds || allowedIds.has(id)) && (effectiveMode === "demo" || verifiedCards.has(id));
+  r.result.findings = r.result.findings
+    .map((f) => ({ ...f, evidence_ids: f.evidence_ids.filter(keep) }))
+    .filter((f) => f.evidence_ids.length > 0);
+  const cited = new Set(r.result.findings.flatMap((f) => f.evidence_ids));
+  r.evidence = r.evidence.filter((c) => cited.has(c.id));
   r.mode = "cached_demo";
+  r.meta.evidenceMode = effectiveMode;
   r.meta.cachedAt = entry.generatedAt;
   r.meta.demoId = entry.demoId;
   r.meta.notices = [`演示缓存结果：生成于 ${entry.generatedAt.slice(0, 16).replace("T", " ")}，不是本次实时生成。${reason}`];

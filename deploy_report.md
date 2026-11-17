@@ -58,6 +58,7 @@
 | `LLM_BASE_URL` | 已填（DeepSeek） | 已填 |
 | `LLM_API_KEY` | 已填 | 已填 |
 | `LLM_MODEL` | 已填（deepseek-chat） | 已填 |
+| `EVIDENCE_MODE` | 已填（demo） | 已填（demo）。提交正式版时改为 `verified_only` 并重新部署 |
 | `LLM_TIMEOUT_MS`、`AUDIT_RATE_LIMIT`、`AUDIT_LOG_DISABLED` | 未填，使用默认值 | 未填，使用默认值 |
 
 Netlify 中的变量均未标记为 “Contains secret values”：`LLM_BASE_URL`、`LLM_MODEL` 的值出现在 README 中，标记为机密会触发 Netlify 密钥扫描导致构建失败。

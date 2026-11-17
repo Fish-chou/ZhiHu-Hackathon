@@ -32,11 +32,12 @@ const modelReturning = (output: unknown): AuditDeps["callModel"] =>
 
 function makeDeps(over: Partial<AuditDeps> = {}): AuditDeps {
   return {
+    evidenceMode: "verified_only",
     search: (p) => searchEvidence(p, { env: DB_ENV, fetchImpl: dbFetch(records) as unknown as typeof fetch, noCache: true }),
     callModel: modelReturning({ overall_level: "low", summary: "无", findings: [], missing_evidence: [] }),
     parseModelJson,
     findDemoCache: () => null,
-    verifiedIds: () => verifiedIds,
+    allowedEvidenceIds: () => verifiedIds,
     now: () => Date.parse("2026-11-14T12:00:00Z"),
     ...over,
   };
@@ -95,7 +96,7 @@ describe("POST /api/audit", () => {
     expect(res.result.overall_level).toBe("medium");
     expect(res.result.findings.map((f) => f.location_match)).toEqual(["exact", "exact"]);
     expect(res.evidence.map((c) => c.id).sort()).toEqual(["risk_008", "rule_003"]);
-    expect(res.evidence.every((c) => c.status === "verified")).toBe(true);
+    expect(res.evidence.every((c) => c.tier === "verified" && c.tierLabel === "已核验来源")).toBe(true);
     // official/risk rules are legal sources, so human review is forced on
     expect(res.result.findings.every((f) => f.requires_human_review)).toBe(true);
     expect(res.result.disclaimer).toBe("结果仅作发布前风险提示，不构成法律意见");
@@ -229,7 +230,7 @@ describe("POST /api/audit", () => {
     const callModelSpy = vi.fn(async (): Promise<ModelCallResult> => ({ ok: false, kind: "network" }));
     const res = (await post(
       { market: "Vietnam", contentType: SKINCARE.contentType, text: SKINCARE.text },
-      makeDeps({ callModel: callModelSpy, findDemoCache: () => entry, verifiedIds: () => new Set(["risk_008"]) }),
+      makeDeps({ callModel: callModelSpy, findDemoCache: () => entry, allowedEvidenceIds: () => new Set(["risk_008"]) }),
     )).json as AuditResponse;
     expect(res.mode).toBe("cached_demo");
     expect(res.meta.notices[0]).toContain("演示缓存结果");

@@ -19,7 +19,10 @@ const SHOT_DIR = `e2e/screenshots/${SLUG}`;
 await mkdir(new URL(SHOT_DIR, root), { recursive: true });
 
 const snapshot = JSON.parse(await readFile(new URL("src/data/evidence-snapshot.json", root), "utf8"));
-const verifiedIds = new Set(snapshot.records.filter((r) => r.status === "verified" && r.market === "Vietnam").map((r) => r.id));
+const bulkIds = new Set(JSON.parse(await readFile(new URL("src/data/bulk-verified.json", root), "utf8")).ids);
+const verifiedIds = new Set(
+  snapshot.records.filter((r) => r.status === "verified" && r.market === "Vietnam" && !bulkIds.has(r.id)).map((r) => r.id),
+);
 const candidateIds = new Set(args["candidate-ids"] ? JSON.parse(await readFile(args["candidate-ids"], "utf8")) : []);
 const secrets = (process.env.E2E_SECRET_STRINGS ?? "").split(",").map((s) => s.trim()).filter((s) => s.length >= 8);
 
@@ -351,16 +354,33 @@ await test(16, "移动端打开", "中", "检查窄屏布局", async (r) => {
   await ctx.close();
 });
 
-await test(17, "candidate 记录不会被引用", "高", "检查证据过滤", async (r) => {
-  r.steps = ["汇总本次测试中所有 /api/audit 返回的证据卡片", "逐条核对：status 为 verified，ID 在 verified 快照中，且不在 candidate 列表中"];
-  const cards = apiResponses.filter((x) => x.body?.ok).flatMap((x) => x.body.evidence);
-  const cited = apiResponses.filter((x) => x.body?.ok).flatMap((x) => x.body.result.findings.flatMap((f) => f.evidence_ids));
-  const bad = [
-    ...cards.filter((c) => c.status !== "verified" || !verifiedIds.has(c.id) || candidateIds.has(c.id)).map((c) => c.id),
-    ...cited.filter((id) => !verifiedIds.has(id) || candidateIds.has(id)),
+await test(17, "候选资料只在演示模式出现，且如实标注", "高", "检查证据过滤", async (r) => {
+  r.steps = [
+    "汇总本次测试中所有 /api/audit 返回的证据卡片",
+    "正式核验模式：每张卡片都是已核验来源，ID 在逐条核验的快照中，且不在 candidate 列表中",
+    "演示模式：候选资料卡片必须标注“候选资料/待核验”，只引用候选资料的判断必须是待人工复核",
   ];
+  const ok = apiResponses.filter((x) => x.body?.ok);
+  const cards = ok.flatMap((x) => x.body.evidence);
+  const cited = ok.flatMap((x) => x.body.result.findings.flatMap((f) => f.evidence_ids));
+  const bad = ok.flatMap((x) => {
+    const demo = x.body.meta?.evidenceMode === "demo";
+    const ids = new Set(x.body.evidence.map((c) => c.id));
+    return [
+      ...x.body.evidence
+        .filter((c) =>
+          c.tier === "candidate"
+            ? !demo || c.tierLabel !== "候选资料/待核验"
+            : c.tier !== "verified" || !verifiedIds.has(c.id) || candidateIds.has(c.id),
+        )
+        .map((c) => c.id),
+      ...x.body.result.findings.flatMap((f) => f.evidence_ids).filter((id) => !ids.has(id)),
+      ...x.body.result.findings.filter((f) => f.evidence_basis === "candidate_only" && f.severity !== "needs_review").map((f) => f.id),
+    ];
+  });
+  const modes = [...new Set(ok.map((x) => x.body.meta?.evidenceMode ?? "verified_only"))].join("、");
   r.pass = bad.length === 0 && cards.length > 0;
-  r.actual = `检查了 ${apiResponses.length} 个审查响应、${cards.length} 张证据卡片、${cited.length} 处引用；candidate 列表 ${candidateIds.size} 条；违规 ${bad.length} 处${bad.length ? `：${[...new Set(bad)].join("、")}` : ""}`;
+  r.actual = `模式：${modes}；检查了 ${apiResponses.length} 个审查响应、${cards.length} 张证据卡片（其中候选资料 ${cards.filter((c) => c.tier === "candidate").length} 张）、${cited.length} 处引用；candidate 列表 ${candidateIds.size} 条；违规 ${bad.length} 处${bad.length ? `：${[...new Set(bad)].join("、")}` : ""}`;
 });
 
 await test(18, "页面不出现 undefined、NaN、调试信息或密钥", "高", "检查页面文字和 HTML", async (r) => {

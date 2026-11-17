@@ -19,11 +19,32 @@
 ```text
 用户输入广告文案、商品页文本或客服话术
 → 系统用风险信号词表提取关键表达
-→ 查询 Supabase evidence_records（只用 market=Vietnam 且 status=verified）
-→ 大模型只依据这些证据判断风险
-→ 程序校验：结构、证据 ID、禁用表述、强制人工复核
+→ 按证据使用模式查询 Supabase evidence_records（见下一节）
+→ 大模型只依据这些证据判断风险，每条证据都标明“已核验来源”或“候选资料/待核验”
+→ 程序校验：结构、证据 ID、证据等级、禁用表述、强制人工复核
 → 返回风险等级、问题位置、证据、修改建议和待人工确认事项
 ```
+
+## 证据使用模式（EVIDENCE_MODE）
+
+| | 正式核验模式 `verified_only` | 演示模式 `demo` |
+|---|---|---|
+| 页面顶部标识 | 正式核验模式 | 演示模式 |
+| 查询条件 | `status=verified` | `status in (verified, candidate)`，分页读取 |
+| 可以进入模型和证据卡片的记录 | 只有逐条核验的 verified 记录 | 已核验来源 + 候选资料 |
+| 证据卡片标注 | 已核验来源 | 已核验来源 / 候选资料/待核验 |
+| 只引用候选资料的判断 | 不会出现 | 风险等级强制降为 `needs_review`（待人工复核），并强制人工复核 |
+| 确定性结论 | 禁用“违法”“一定违规”“越南消费者普遍认为”等 | 同左；凡引用了候选资料的判断，再额外改写“消费者普遍认为”“构成违规”“一定会”“一律禁止”等 |
+| rejected 记录 | 不读取 | 不读取 |
+
+- 不设置或填错时默认 `verified_only`。修改后需要重新部署才生效（页面顶部标识在构建时确定）。
+- 两种模式都**不修改** `evidence_records.status`。网站对证据表只有读取，写入只发生在 `analysis_runs` 和 `findings`，测试中有静态检查。
+- 2026-11-14 从 candidate 批量改为 verified 的 153 条记录（名单见 `src/data/bulk-verified.json`）没有逐条核对来源。数据库中的状态保持原样，但网站一律按“候选资料/待核验”处理：正式核验模式不使用，演示模式标为候选资料。
+- 候选资料多由表格转换而来，大多没有来源链接；卡片上会写“无来源链接”。原文字段只有“—”等占位符时，改为显示“原始资料行”。
+- 演示模式下，每次检索最多放入 8 条候选资料，其余名额优先给已核验来源。
+- 演示缓存（模型失败时的备用结果）只在 `verified_only` 下生成，只引用逐条核验的证据，两种模式都可以安全展示。
+
+当前线上使用演示模式。提交正式版时，在 Netlify 把 `EVIDENCE_MODE` 改为 `verified_only` 并重新部署即可，代码不需要改动。
 
 失败时的降级：
 
@@ -48,6 +69,7 @@ Next.js 16（App Router）、React 19、TypeScript、Tailwind CSS 4、Supabase�
 | `LLM_BASE_URL` | 否 | 模型的 OpenAI 兼容地址，如 `https://api.deepseek.com` |
 | `LLM_API_KEY` | 否 | 模型密钥 |
 | `LLM_MODEL` | 否 | 模型名称，如 `deepseek-chat` |
+| `EVIDENCE_MODE` | 否 | `demo`（演示模式）或 `verified_only`（正式核验模式，默认）。见“证据使用模式” |
 | `LLM_TIMEOUT_MS` | 否 | 模型超时，默认 40000 |
 | `AUDIT_RATE_LIMIT` | 否 | 每个 IP 每分钟最多实时审查次数，默认 10 |
 | `AUDIT_LOG_DISABLED` | 否 | 设为 `1` 时不写审查记录 |
@@ -67,9 +89,9 @@ Supabase 中有四张表：
 
 ### verified、candidate、rejected 的区别
 
-- **verified**：数据侧已打开原始来源，核对过标题、链接和引文。只有这类记录会被检索和展示。对知乎内容来说，verified 只表示内容存在且与链接一致，不表示作者的说法正确。
-- **candidate**：有一定价值但证据不足，只用于继续查证，网站不会读取。
-- **rejected**：已排除，网站不会读取。
+- **verified**：数据侧已打开原始来源，核对过标题、链接和引文，网站标为“已核验来源”。两种模式都使用。对知乎内容来说，verified 只表示内容存在且与链接一致，不表示作者的说法正确。批量标记的 153 条除外，见上一节。
+- **candidate**：有一定价值但证据不足。只在演示模式下读取，标为“候选资料/待核验”。
+- **rejected**：已排除，任何模式都不读取。
 
 ### 导入 evidence_records
 
@@ -82,7 +104,7 @@ select record_type, status, count(*) from evidence_records group by 1, 2 order b
 select id from evidence_records where status = 'verified' and (source_url is null or source_url = '');
 ```
 
-4. **上线前必须运行** `supabase/policies.sql`：开启行级安全，让公开 key 只能读取越南市场的 verified 记录，只能新增审查记录。
+4. **上线前必须运行** `supabase/policies.sql`：开启行级安全，让公开 key 只能读取越南市场的 verified 和 candidate 记录（读不到 rejected），只能新增审查记录。
 5. 更新离线快照（可选）：把 `market=Vietnam AND status=verified` 的记录原样导出为 `src/data/evidence-snapshot.json`（格式见文件开头的说明字段），不得手工增改。
 
 ## 本地启动
@@ -100,7 +122,7 @@ npm run dev                      # 打开 http://localhost:3000
 ```bash
 npm run lint         # 代码检查
 npm run typecheck    # 类型检查
-npm test             # 单元和接口测试（35 项，不需要网络和密钥）
+npm test             # 单元和接口测试（51 项，不需要网络和密钥）
 npm run build && npm start   # 生产模式
 node scripts/generate-demo-cache.mjs http://localhost:3000   # 用真实模型重新生成演示缓存
 ```
