@@ -4,13 +4,42 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { requestAudit, type ClientOutcome } from "@/lib/audit/client";
 import { DEMO_CASES, type DemoCase } from "@/lib/audit/demo-cache";
-import { CONTENT_TYPES, CONTENT_TYPE_LABELS, MAX_TEXT_LENGTH, type AuditResponse, type ContentType } from "@/lib/audit/types";
+import { CONTENT_TYPE_LABELS, MAX_TEXT_LENGTH, type AuditResponse, type ContentType } from "@/lib/audit/types";
 import type { EvidenceCard } from "@/lib/types";
 import { EvidenceDrawer } from "./evidence-drawer";
+import { FeatureMenu, type FeatureMenuGroup } from "./feature-menu";
 import { LEVEL_UI } from "./levels";
 import { ResultView } from "./result-view";
 
 const STAGES = ["正在读取输入", "正在匹配越南市场证据", "正在生成风险判断", "正在校验来源"];
+
+/** 功能菜单配置。市场一栏当前只有越南，保留结构以便后续扩展。 */
+const MENU_GROUPS: FeatureMenuGroup[] = [
+  {
+    id: "market",
+    title: "目标市场",
+    hint: "其他市场尚未接入证据",
+    items: [
+      { id: "Vietnam", label: "越南 Vietnam", description: "证据库目前只覆盖越南市场" },
+      { id: "Thailand", label: "泰国 Thailand", description: "暂未接入证据", disabled: true, badge: "即将支持" },
+      { id: "Indonesia", label: "印尼 Indonesia", description: "暂未接入证据", disabled: true, badge: "即将支持" },
+    ],
+  },
+  {
+    id: "contentType",
+    title: "内容类型",
+    items: [
+      { id: "advertisement", label: "广告文案", description: "投放素材、推广标语、活动文案" },
+      { id: "product_page", label: "商品详情页", description: "标题、卖点、规格与图文说明" },
+      {
+        id: "customer_service",
+        label: "客服话术",
+        description: "售前答疑、售后与退换回复",
+        note: "售后与物流类已核验证据较少，可能提示未找到依据",
+      },
+    ],
+  },
+];
 
 type Phase =
   | { name: "idle" }
@@ -147,37 +176,14 @@ export function AuditWorkspace() {
             </div>
           )}
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8">
-            <p className="text-sm">
-              <span className="text-muted">目标市场</span>
-              <span className="ml-2 font-semibold">越南 Vietnam</span>
-              <span className="ml-2 text-xs text-muted">当前只支持越南</span>
-            </p>
-            <fieldset className="flex flex-wrap items-center gap-2 text-sm">
-              <legend className="sr-only">内容类型</legend>
-              <span aria-hidden className="mr-1 text-muted">
-                内容类型
-              </span>
-              {CONTENT_TYPES.map((t) => (
-                <label
-                  key={t}
-                  className={`cursor-pointer rounded-md border px-3 py-1.5 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-cite ${
-                    contentType === t ? "border-ink bg-ink text-white" : "border-rule bg-sheet hover:border-ink"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="contentType"
-                    value={t}
-                    checked={contentType === t}
-                    onChange={() => setContentType(t)}
-                    className="sr-only"
-                  />
-                  {CONTENT_TYPE_LABELS[t]}
-                </label>
-              ))}
-            </fieldset>
-          </div>
+          <FeatureMenu
+            groups={MENU_GROUPS}
+            value={{ market: "Vietnam", contentType }}
+            onChange={(groupId, itemId) => {
+              if (groupId === "contentType") setContentType(itemId as ContentType);
+            }}
+            summary={`越南 Vietnam · ${CONTENT_TYPE_LABELS[contentType]}`}
+          />
 
           <div className="rounded-lg border border-rule bg-sheet focus-within:border-ink">
             <label htmlFor="audit-text" className="sr-only">
